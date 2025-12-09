@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace WinApp.Controllers
 {
     using Models;
-    
+
     class LoginController : DataController<TaiKhoan>
-    {        
+    {
         public override object Index()
         {
             return View(new EditContext(new TaiKhoan { Ten = "dev", MatKhau = "1234" }));
@@ -30,7 +30,6 @@ namespace WinApp.Controllers
                 return;
             }
 
-            // Chỗ này khả năng xuất hiện lỗi chưa định nghĩa lớp trong file Actors/User.cs
             var role = Provider.GetTable<Quyen>().GetValueById("Ext", acc.QuyenId);
             var u = (User)Activator.CreateInstance(Type.GetType($"Actors.{role}"));
 
@@ -58,6 +57,15 @@ namespace WinApp.Controllers
         }
         protected override object UpdateSuccess()
         {
+            // KTPMUD: Update ngay lập tức khi đăng nhập thành công
+            if (App.User != null)
+            {
+                Provider.CreateCommand(cmd => {
+                    cmd.CommandText = $"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{App.User.UserName}'";
+                    try { cmd.ExecuteNonQuery(); } catch { }
+                });
+            }
+
             errorCount = 0;
             return Redirect("home");
         }

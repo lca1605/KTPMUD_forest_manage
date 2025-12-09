@@ -13,8 +13,25 @@ namespace WinApp.Controllers
     }
     class BaseController : System.Mvc.Controller
     {
-        public virtual object Index() => View();
-    }S
+        // KTPMUD: Hàm này để cập nhật giờ user đang thao tác
+        protected void CheckUserActivity()
+        {
+            if (App.User != null && !string.IsNullOrEmpty(App.User.UserName))
+            {
+                // Gọi lệnh SQL update thẳng vào DB cho nhanh
+                Provider.CreateCommand(cmd => {
+                    cmd.CommandText = $"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{App.User.UserName}'";
+                    try { cmd.ExecuteNonQuery(); } catch { }
+                });
+            }
+        }
+
+        public virtual object Index()
+        {
+            CheckUserActivity(); // KTPMUD: Gọi hàm check
+            return View();
+        }
+    }
 
     class DataController<T> : BaseController
     {
@@ -30,25 +47,32 @@ namespace WinApp.Controllers
         }
         public override object Index()
         {
+            CheckUserActivity(); // KTPMUD: Gọi hàm check
             return View(DataEngine.ToList<T>(null, null));
         }
         public virtual object Delete(T entity)
         {
+            CheckUserActivity();
             return View(new EditContext(entity, EditActions.Delete));
         }
         public virtual object Edit(T entity)
         {
+            CheckUserActivity();
             return View(new EditContext(entity));
         }
         public virtual object Add()
         {
+            CheckUserActivity();
             return View(new EditContext(CreateEntity(), EditActions.Insert));
         }
 
         protected UpdateContext UpdateContext { get; set; }
         public object Update(EditContext context)
         {
-            UpdateContext = new UpdateContext {
+            CheckUserActivity(); // KTPMUD: Gọi hàm check
+
+            UpdateContext = new UpdateContext
+            {
                 Action = context.Action,
                 Model = context.Model,
             };
@@ -60,13 +84,16 @@ namespace WinApp.Controllers
             return UpdateSuccess();
         }
 
-        protected virtual void TryInsert(T e) {
+        protected virtual void TryInsert(T e)
+        {
             ExecSQL(DataEngine.CreateInsertSql(e));
         }
-        protected virtual void TryUpdate(T e) {
+        protected virtual void TryUpdate(T e)
+        {
             ExecSQL(DataEngine.CreateUpdateSql(e));
         }
-        protected virtual void TryDelete(T e) {
+        protected virtual void TryDelete(T e)
+        {
             ExecSQL(DataEngine.CreateDeleteSql(e));
         }
         protected virtual object UpdateSuccess()
@@ -100,7 +127,7 @@ namespace WinApp.Controllers
 
                 var doc = Document.FromObject(UpdateContext.Model);
                 var res = 0;
-                
+
                 doc.Add("action", (int)UpdateContext.Action);
                 foreach (var p in proc.Parameters.Values)
                 {

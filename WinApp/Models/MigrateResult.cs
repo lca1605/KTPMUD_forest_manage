@@ -51,6 +51,8 @@ namespace Models
         public string MatKhau { get; set; }
         public int QuyenId { get; set; }
         public int HoSoId { get; set; }
+        // KTPMUD: Thêm trường này để mapping với cột mới tạo trong SQL
+        public DateTime? LanCuoiHoatDong { get; set; }
     }
 
     public class TenHanhChinh
@@ -80,5 +82,21 @@ namespace Models
         public string MatKhau { get; set; }
         public int QuyenId { get; set; }
         public string Quyen { get; set; }
+
+        // KTPMUD: Lấy dữ liệu thời gian từ DB lên
+        public DateTime? LanCuoiHoatDong { get; set; }
+
+        // KTPMUD: Logic kiểm tra Online (trong vòng 5 phút)
+        public string TrangThai
+        {
+            get
+            {
+                if (LanCuoiHoatDong != null && LanCuoiHoatDong.Value > DateTime.Now.AddMinutes(-5))
+                {
+                    return "Online";
+                }
+                return "Offline";
+            }
+        }
     }
 }
