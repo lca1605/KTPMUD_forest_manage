@@ -1,4 +1,4 @@
-﻿use KTPM 
+﻿use KTPM
 go
 
 drop proc updateDonVi

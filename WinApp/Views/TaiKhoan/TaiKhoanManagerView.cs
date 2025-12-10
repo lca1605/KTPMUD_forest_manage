@@ -20,6 +20,9 @@ namespace WinApp.Views.TaiKhoan
             context.Title = "Danh sách người dùng";
             context.TableColumns = new TC[] {
                 new TC { Name = "Ten", Caption = "Họ tên", Width = 250 },
+                // KTPMUD: Đây là cột mới hiển thị trạng thái
+                new TC { Name = "TrangThai", Caption = "Trạng thái", Width = 100 },
+
                 new TC { Name = "SDT", Caption = "Số điện thoại", Width = 120 },
                 new TC { Name = "Email", Caption = "Email", Width = 120 },
                 new TC { Name = "TenDangNhap", Caption = "Tên đăng nhập", Width = 120 },
@@ -54,7 +57,7 @@ namespace WinApp.Views.TaiKhoan
                 new TE { Name = "TenDangNhap", Caption = "Tên đăng nhập", Layout = 6 },
 
                 new TE { Name = "QuyenId", Caption = "Quyền truy cập", Layout = 6,
-                    Type = "select", ValueName = "Id", DisplayName = "Ten", 
+                    Type = "select", ValueName = "Id", DisplayName = "Ten",
                     Options = Provider.Select<Models.Quyen>(),
                 },
             };
