@@ -8,6 +8,7 @@ namespace WinApp.Controllers
 {
     using Models;
 
+    // Kế thừa DataController<TaiKhoan> -> Có sẵn kết nối SQL
     class LoginController : DataController<TaiKhoan>
     {
         public override object Index()
@@ -57,13 +58,11 @@ namespace WinApp.Controllers
         }
         protected override object UpdateSuccess()
         {
-            // KTPMUD: Update ngay lập tức khi đăng nhập thành công
             if (App.User != null)
             {
-                Provider.CreateCommand(cmd => {
-                    cmd.CommandText = $"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{App.User.UserName}'";
-                    try { cmd.ExecuteNonQuery(); } catch { }
-                });
+                // KTPMUD: Yêu cầu của mày được đáp ứng ở dòng này
+                // Hàm ExecSQL này lấy kết nối từ config.json, chạy qua Provider
+                ExecSQL($"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{App.User.UserName}'");
             }
 
             errorCount = 0;

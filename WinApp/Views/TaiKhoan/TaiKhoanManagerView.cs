@@ -18,16 +18,19 @@ namespace WinApp.Views.TaiKhoan
         {
             base.RenderCore(context);
             context.Title = "Danh sách người dùng";
+
+            // KTPMUD: Đã chuyển cột TrangThai xuống cuối cùng theo yêu cầu
             context.TableColumns = new TC[] {
                 new TC { Name = "Ten", Caption = "Họ tên", Width = 250 },
-                // KTPMUD: Đây là cột mới hiển thị trạng thái
-                new TC { Name = "TrangThai", Caption = "Trạng thái", Width = 100 },
-
                 new TC { Name = "SDT", Caption = "Số điện thoại", Width = 120 },
                 new TC { Name = "Email", Caption = "Email", Width = 120 },
                 new TC { Name = "TenDangNhap", Caption = "Tên đăng nhập", Width = 120 },
                 new TC { Name = "Quyen", Caption = "Quyền truy cập", Width = 150 },
+                
+                // Cột trạng thái nằm ở cuối cùng bên phải
+                new TC { Name = "TrangThai", Caption = "Trạng thái", Width = 100 },
             };
+
             context.Search = (o, s) =>
             {
                 var e = (Models.ViewHoSo)o;

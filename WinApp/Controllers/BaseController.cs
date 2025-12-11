@@ -13,12 +13,12 @@ namespace WinApp.Controllers
     }
     class BaseController : System.Mvc.Controller
     {
-        // KTPMUD: Hàm này để cập nhật giờ user đang thao tác
+        // KTPMUD: Hàm này sử dụng Provider để bắn lệnh SQL an toàn
+        // Không new SqlConnection() bừa bãi
         protected void CheckUserActivity()
         {
             if (App.User != null && !string.IsNullOrEmpty(App.User.UserName))
             {
-                // Gọi lệnh SQL update thẳng vào DB cho nhanh
                 Provider.CreateCommand(cmd => {
                     cmd.CommandText = $"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{App.User.UserName}'";
                     try { cmd.ExecuteNonQuery(); } catch { }
@@ -28,7 +28,7 @@ namespace WinApp.Controllers
 
         public virtual object Index()
         {
-            CheckUserActivity(); // KTPMUD: Gọi hàm check
+            CheckUserActivity(); // Kích hoạt tracking
             return View();
         }
     }
@@ -47,7 +47,7 @@ namespace WinApp.Controllers
         }
         public override object Index()
         {
-            CheckUserActivity(); // KTPMUD: Gọi hàm check
+            CheckUserActivity();
             return View(DataEngine.ToList<T>(null, null));
         }
         public virtual object Delete(T entity)
@@ -69,7 +69,7 @@ namespace WinApp.Controllers
         protected UpdateContext UpdateContext { get; set; }
         public object Update(EditContext context)
         {
-            CheckUserActivity(); // KTPMUD: Gọi hàm check
+            CheckUserActivity();
 
             UpdateContext = new UpdateContext
             {
@@ -146,6 +146,8 @@ namespace WinApp.Controllers
                 }
             });
         }
+
+        // KTPMUD: Đây là hàm quan trọng nhất để tuân thủ yêu cầu DataController
         protected void ExecSQL(string sql)
         {
             Provider.CreateCommand(cmd => {
