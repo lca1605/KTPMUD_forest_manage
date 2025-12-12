@@ -74,10 +74,10 @@
     <Compile Include="Controllers\TaiKhoanController.cs" />
     <Compile Include="Models\%28Document%29.cs" />
     <Compile Include="Models\Account.cs" />
+    <Compile Include="Models\DbModels.cs" />
     <Compile Include="Models\Migration\CodeGenerator.cs" />
     <Compile Include="Models\Config.cs" />
     <Compile Include="Models\DonVi.cs" />
-    <Compile Include="Models\MigrateResult.cs" />
     <Compile Include="Models\Migration\Provider.cs" />
     <Compile Include="Models\UpdateContext.cs" />
     <Compile Include="Views\Admin\Test.cs" />
