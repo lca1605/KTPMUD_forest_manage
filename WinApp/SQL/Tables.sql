@@ -37,6 +37,7 @@ create table TaiKhoan
 , MatKhau varchar(255)
 , QuyenId int foreign key references Quyen(Id)
 , HoSoId int foreign key references HoSo(Id)
+, LanCuoiHoatDong datetime null
 )
 go
 insert into TaiKhoan values
@@ -47,7 +48,7 @@ insert into TaiKhoan values
 go
 
 create view ViewHoSo as
-	SELECT HoSo.*, TaiKhoan.Ten as TenDangNhap, MatKhau, QuyenId, Quyen.Ten as Quyen FROM TaiKhoan
+	SELECT HoSo.*, TaiKhoan.Ten as TenDangNhap, MatKhau, QuyenId, Quyen.Ten as Quyen, TaiKhoan.LanCuoiHoatDong FROM TaiKhoan
 	INNER JOIN Quyen ON QuyenId = Quyen.Id
 	INNER JOIN HoSo ON HoSoId = HoSo.Id
 go

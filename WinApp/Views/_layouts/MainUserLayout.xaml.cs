@@ -24,10 +24,10 @@ namespace WinApp.Views
         public MainUserLayout()
         {
             InitializeComponent();
-            var name = App.User?.Description;
-            MeButton.SetAction( name == null ? 
-                new ActionContext("Đăng xuất", "Home/Logout") :
-                new ActionContext(name, "Profile"));
+
+            MeButton.SetAction(
+                new ActionContext("Đăng xuất", "Home/Logout")
+            );
         }
     }
 

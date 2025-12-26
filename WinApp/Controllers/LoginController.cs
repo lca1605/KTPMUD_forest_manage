@@ -31,6 +31,11 @@ namespace WinApp.Controllers
                 return;
             }
 
+            var userName = acc.Ten.Replace("'", "''");
+            ExecSQL(
+                $"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{userName}'"
+            );
+
             var role = Provider.GetTable<Quyen>().GetValueById("Ext", acc.QuyenId);
             var u = (User)Activator.CreateInstance(Type.GetType($"Actors.{role}"));
 
@@ -58,13 +63,6 @@ namespace WinApp.Controllers
         }
         protected override object UpdateSuccess()
         {
-            if (App.User != null)
-            {
-                // KTPMUD: Yêu cầu của mày được đáp ứng ở dòng này
-                // Hàm ExecSQL này lấy kết nối từ config.json, chạy qua Provider
-                ExecSQL($"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{App.User.UserName}'");
-            }
-
             errorCount = 0;
             return Redirect("home");
         }

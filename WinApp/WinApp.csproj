@@ -90,6 +90,7 @@
     <Compile Include="Views\Home\Developer.cs" />
     <Compile Include="Views\HanhChinh\HanhChinhManagerView.cs" />
     <Compile Include="Views\Home\Loading.cs" />
+    <Compile Include="Views\Home\Staff.cs" />
     <Compile Include="Views\Me\ProfileView.cs" />
     <Compile Include="Views\Migrate\Index.cs" />
     <Compile Include="Views\Migrate\MigrateLayout.xaml.cs">

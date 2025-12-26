@@ -33,5 +33,6 @@ namespace WinApp.Controllers
 
         public object Admin() => View();
         public object Developer() => View();
+        public object Staff() => View();
     }
 }

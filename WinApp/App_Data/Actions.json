@@ -69,7 +69,37 @@
         "Childs": [
           {
             "Text": "Dữ liệu",
-            "Refs": ["giongcay/index", "giongcay/cssx"]
+            "Refs": [ "giongcay/index", "giongcay/cssx" ]
+          },
+          {
+            "Text": "Thống kê",
+            "Refs": [ "giongcay/index" ]
+          }
+        ]
+      }
+    },
+    "Staff": {
+      "home": {
+        "Childs": [
+          {
+            "Text": "Người dùng",
+            "Refs": [ "taikhoan", "taikhoan/lichsu" ]
+          },
+          {
+            "Text": "Hành chính",
+            "Refs": [ "hanhchinh", "hanhchinh/huyen", "hanhchinh/xa" ]
+          },
+          {
+            "Text": "Profile",
+            "Refs": [ "me/changepass" ]
+          }
+        ]
+      },
+      "giongcay": {
+        "Childs": [
+          {
+            "Text": "Dữ liệu",
+            "Refs": [ "giongcay/index", "giongcay/cssx" ]
           },
           {
             "Text": "Thống kê",
