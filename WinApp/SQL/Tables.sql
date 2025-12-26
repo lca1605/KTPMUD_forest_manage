@@ -1,4 +1,4 @@
-﻿USE master;
+﻿USE KTPM;
 GO
 
 IF DB_ID('KTPM') IS NULL
