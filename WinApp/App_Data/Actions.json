@@ -1,6 +1,6 @@
 ﻿{
   "#": {
-    "home": "Trang chủ",
+    "home": "Hành chính",
     "migrate": "Load database",
     "migrate/csharp": "C#",
     "migrate/s/model": "Models",
@@ -19,6 +19,7 @@
     "giongcay/cssx": "Cơ sở sản xuất",
     "sanxuat": "Sản xuất",
     "tainguyen": "Tài nguyên",
+    "quanlycoso": "Quản lý cơ sở",
     ".": ""
   },
   "actors": {
@@ -83,7 +84,7 @@
         "Childs": [
           {
             "Text": "Người dùng",
-            "Refs": [ "taikhoan", "taikhoan/lichsu" ]
+            "Refs": [ "taikhoan" ]
           },
           {
             "Text": "Hành chính",
@@ -95,15 +96,19 @@
           }
         ]
       },
-      "giongcay": {
+      "quanlycoso": {
         "Childs": [
           {
-            "Text": "Dữ liệu",
+            "Text": "Quản lý giống cây trồng",
             "Refs": [ "giongcay/index", "giongcay/cssx" ]
           },
           {
-            "Text": "Thống kê",
+            "Text": "Quản lý cơ sở chế biến gỗ",
             "Refs": [ "giongcay/index" ]
+          },
+          {
+            "Text": "Quản lý sinh vật rừng",
+            "Refs": [ "giongcay/index", "giongcay/cssx" ]
           }
         ]
       }
