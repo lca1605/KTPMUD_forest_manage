@@ -64,16 +64,17 @@
     <Compile Include="Actors\User.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\GiongCayController.cs" />
     <Compile Include="Controllers\HanhChinhController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\MeController.cs" />
     <Compile Include="Controllers\MigrateController.cs" />
     <Compile Include="Controllers\MigrateResult.cs" />
+    <Compile Include="Controllers\CoSoController.cs" />
     <Compile Include="Controllers\TaiKhoanController.cs" />
     <Compile Include="Models\%28Document%29.cs" />
     <Compile Include="Models\Account.cs" />
+    <Compile Include="Models\CoSo.cs" />
     <Compile Include="Models\DbModels.cs" />
     <Compile Include="Models\Migration\CodeGenerator.cs" />
     <Compile Include="Models\Config.cs" />
@@ -82,7 +83,10 @@
     <Compile Include="Models\UpdateContext.cs" />
     <Compile Include="Views\Admin\Test.cs" />
     <Compile Include="Views\BaseView.cs" />
-    <Compile Include="Views\GiongCay\Index.cs" />
+    <Compile Include="Views\CoSo\DongVat.cs" />
+    <Compile Include="Views\CoSo\Giong.cs" />
+    <Compile Include="Views\CoSo\Go.cs" />
+    <Compile Include="Views\CoSo\Index.cs" />
     <Compile Include="Views\HanhChinh\DonViSelector.xaml.cs">
       <DependentUpon>DonViSelector.xaml</DependentUpon>
     </Compile>

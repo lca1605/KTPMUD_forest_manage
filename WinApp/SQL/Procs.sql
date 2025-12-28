@@ -1,147 +1,671 @@
-﻿use KTPM
-go
+﻿USE KTPM
+GO
 
-if object_id('updateDonVi') is not null
-    drop proc updateDonVi
-go
+/* =========================
+   1) updateDonVi
+   ========================= */
+IF OBJECT_ID('updateDonVi') IS NOT NULL
+    DROP PROC updateDonVi
+GO
 
-create proc updateDonVi
+CREATE PROC updateDonVi
 (
-    @action int,              -- -1: delete | 0: update | 1: insert
-    @Id int output,
-    @Ten nvarchar(50) = null,
-    @HanhChinhId int = null,
-    @TenHanhChinh nvarchar(50) = null,
-    @TrucThuocId int = null
+    @action INT,              -- -1: delete | 0: update | 1: insert
+    @Id INT OUTPUT,
+    @Ten NVARCHAR(50) = NULL,
+    @HanhChinhId INT = NULL,
+    @TenHanhChinh NVARCHAR(50) = NULL,
+    @TrucThuocId INT = NULL
 )
-as
-begin
-    set nocount on;
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    begin try
-        begin tran
+    BEGIN TRY
+        BEGIN TRAN
 
         -- DELETE
-        if @action = -1
-        begin
-            delete from DonVi where Id = @Id
-            commit
-            return
-        end
+        IF @action = -1
+        BEGIN
+            DELETE FROM DonVi WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
 
         -- UPDATE
-        if @action = 0
-        begin
-            update DonVi
-            set Ten = @Ten,
+        IF @action = 0
+        BEGIN
+            UPDATE DonVi
+            SET Ten = @Ten,
                 HanhChinhId = @HanhChinhId,
                 TenHanhChinh = @TenHanhChinh,
                 TrucThuocId = @TrucThuocId
-            where Id = @Id
+            WHERE Id = @Id
 
-            commit
-            return
-        end
+            COMMIT
+            RETURN
+        END
 
         -- INSERT
-        insert into DonVi (Ten, HanhChinhId, TenHanhChinh, TrucThuocId)
-        values (@Ten, @HanhChinhId, @TenHanhChinh, @TrucThuocId)
+        INSERT INTO DonVi (Ten, HanhChinhId, TenHanhChinh, TrucThuocId)
+        VALUES (@Ten, @HanhChinhId, @TenHanhChinh, @TrucThuocId)
 
-        set @Id = scope_identity()
+        SET @Id = SCOPE_IDENTITY()
 
-        commit
-    end try
-    begin catch
-        if @@trancount > 0 rollback
-        throw
-    end catch
-end
-go
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
 
+/* =========================
+   2) updateHoSo
+   ========================= */
+IF OBJECT_ID('updateHoSo') IS NOT NULL
+    DROP PROC updateHoSo
+GO
 
-if object_id('updateHoSo') is not null
-    drop proc updateHoSo
-go
-
-create proc updateHoSo
+CREATE PROC updateHoSo
 (
-    @action int,                  -- -1: delete | 0: update | 1: insert
-    @Id int output,               -- HoSo.Id
-    @TenDangNhap varchar(50),
-    @Ten nvarchar(50) = null,
-    @SDT varchar(50) = null,
-    @Email varchar(50) = null,
-    @Ext text = null,
-    @MatKhau varchar(255) = null,
-    @QuyenId int = null
+    @action INT,                  -- -1: delete | 0: update | 1: insert
+    @Id INT OUTPUT,               -- HoSo.Id
+    @TenDangNhap VARCHAR(50),
+    @Ten NVARCHAR(50) = NULL,
+    @SDT VARCHAR(50) = NULL,
+    @Email VARCHAR(50) = NULL,
+    @Ext TEXT = NULL,
+    @MatKhau VARCHAR(255) = NULL,
+    @QuyenId INT = NULL
 )
-as
-begin
-    set nocount on;
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    begin try
-        begin tran
+    BEGIN TRY
+        BEGIN TRAN
 
         -- DELETE
-        if @action = -1
-        begin
-            delete from TaiKhoan where Ten = @TenDangNhap
-            delete from HoSo where Id = @Id
-            commit
-            return
-        end
+        IF @action = -1
+        BEGIN
+            DELETE FROM TaiKhoan WHERE Ten = @TenDangNhap
+            DELETE FROM HoSo WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
 
         -- UPDATE HoSo
-        if @action = 0
-        begin
-            update HoSo
-            set Ten = @Ten,
+        IF @action = 0
+        BEGIN
+            UPDATE HoSo
+            SET Ten = @Ten,
                 SDT = @SDT,
                 Email = @Email,
                 Ext = @Ext
-            where Id = @Id
+            WHERE Id = @Id
 
-            commit
-            return
-        end
+            COMMIT
+            RETURN
+        END
 
         -- INSERT
-        if exists (select 1 from TaiKhoan where Ten = @TenDangNhap)
-        begin
-            raiserror (N'Tài khoản đã tồn tại', 16, 1)
-        end
+        IF EXISTS (SELECT 1 FROM TaiKhoan WHERE Ten = @TenDangNhap)
+        BEGIN
+            RAISERROR (N'Tài khoản đã tồn tại', 16, 1)
+        END
 
-        insert into HoSo (Ten, SDT, Email, Ext)
-        values (@Ten, @SDT, @Email, @Ext)
+        INSERT INTO HoSo (Ten, SDT, Email, Ext)
+        VALUES (@Ten, @SDT, @Email, @Ext)
 
-        set @Id = scope_identity()
+        SET @Id = SCOPE_IDENTITY()
 
-        insert into TaiKhoan (Ten, MatKhau, QuyenId, HoSoId)
-        values (@TenDangNhap, @MatKhau, @QuyenId, @Id)
+        INSERT INTO TaiKhoan (Ten, MatKhau, QuyenId, HoSoId)
+        VALUES (@TenDangNhap, @MatKhau, @QuyenId, @Id)
 
-        commit
-    end try
-    begin catch
-        if @@trancount > 0 rollback
-        throw
-    end catch
-end
-go
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
 
+/* =========================
+   3) changePass
+   ========================= */
+IF OBJECT_ID('changePass') IS NOT NULL
+    DROP PROC changePass
+GO
 
-if object_id('changePass') is not null
-    drop proc changePass
-go
-
-create proc changePass
+CREATE PROC changePass
 (
-    @Ten varchar(50),
-    @MatKhau varchar(255)
+    @Ten VARCHAR(50),
+    @MatKhau VARCHAR(255)
 )
-as
-begin
-    update TaiKhoan
-    set MatKhau = @MatKhau
-    where Ten = @Ten
-end
-go
+AS
+BEGIN
+    UPDATE TaiKhoan
+    SET MatKhau = @MatKhau
+    WHERE Ten = @Ten
+END
+GO
+
+/* =========================
+   4) updateGiongCay
+   ========================= */
+IF OBJECT_ID('updateGiongCay') IS NOT NULL
+    DROP PROC updateGiongCay
+GO
+
+CREATE PROC updateGiongCay
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @Ten NVARCHAR(50) = NULL,
+    @Nguon NVARCHAR(255) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM GiongCay WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE GiongCay
+            SET Ten = @Ten,
+                Nguon = @Nguon
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO GiongCay (Ten, Nguon)
+        VALUES (@Ten, @Nguon)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   5) updateCoSo
+   ========================= */
+IF OBJECT_ID('updateCoSo') IS NOT NULL
+    DROP PROC updateCoSo
+GO
+
+CREATE PROC updateCoSo
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @DonViId INT = NULL,
+    @LoaiCoSoId INT = NULL,
+    @Ten NVARCHAR(150) = NULL,
+    @DiaChi NVARCHAR(200) = NULL,
+    @SDT VARCHAR(20) = NULL,
+    @NguoiDaiDien NVARCHAR(100) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM CoSo WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE CoSo
+            SET DonViId = @DonViId,
+                LoaiCoSoId = @LoaiCoSoId,
+                Ten = @Ten,
+                DiaChi = @DiaChi,
+                SDT = @SDT,
+                NguoiDaiDien = @NguoiDaiDien
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO CoSo (DonViId, LoaiCoSoId, Ten, DiaChi, SDT, NguoiDaiDien)
+        VALUES (@DonViId, @LoaiCoSoId, @Ten, @DiaChi, @SDT, @NguoiDaiDien)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   6) updateLoaiGiongCayTrong
+   ========================= */
+IF OBJECT_ID('updateLoaiGiongCayTrong') IS NOT NULL
+    DROP PROC updateLoaiGiongCayTrong
+GO
+
+CREATE PROC updateLoaiGiongCayTrong
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @Ten NVARCHAR(100) = NULL,
+    @MoTa NVARCHAR(200) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM LoaiGiongCayTrong WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE LoaiGiongCayTrong
+            SET Ten = @Ten,
+                MoTa = @MoTa
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO LoaiGiongCayTrong (Ten, MoTa)
+        VALUES (@Ten, @MoTa)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   7) updateThongKeCoSoGiong
+   ========================= */
+IF OBJECT_ID('updateThongKeCoSoGiong') IS NOT NULL
+    DROP PROC updateThongKeCoSoGiong
+GO
+
+CREATE PROC updateThongKeCoSoGiong
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @CoSoId INT = NULL,
+    @LoaiKyBaoCaoId INT = NULL,
+    @Nam INT = NULL,
+    @KySo INT = NULL,
+    @GiaTriKy DECIMAL(18,2) = NULL,
+    @DienTich DECIMAL(18,2) = NULL,
+    @SanLuong DECIMAL(18,2) = NULL,
+    @GhiChu NVARCHAR(200) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM ThongKeCoSoGiong WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE ThongKeCoSoGiong
+            SET CoSoId = @CoSoId,
+                LoaiKyBaoCaoId = @LoaiKyBaoCaoId,
+                Nam = @Nam,
+                KySo = @KySo,
+                GiaTriKy = @GiaTriKy,
+                DienTich = @DienTich,
+                SanLuong = @SanLuong,
+                GhiChu = @GhiChu
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO ThongKeCoSoGiong (CoSoId, LoaiKyBaoCaoId, Nam, KySo, GiaTriKy, DienTich, SanLuong, GhiChu)
+        VALUES (@CoSoId, @LoaiKyBaoCaoId, @Nam, @KySo, @GiaTriKy, @DienTich, @SanLuong, @GhiChu)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   8) updateThongKeCoSoGo
+   ========================= */
+IF OBJECT_ID('updateThongKeCoSoGo') IS NOT NULL
+    DROP PROC updateThongKeCoSoGo
+GO
+
+CREATE PROC updateThongKeCoSoGo
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @CoSoId INT = NULL,
+    @LoaiKyBaoCaoId INT = NULL,
+    @Nam INT = NULL,
+    @KySo INT = NULL,
+    @GiaTriKy DECIMAL(18,2) = NULL,
+    @DienTich DECIMAL(18,2) = NULL,
+    @SanLuong DECIMAL(18,2) = NULL,
+    @GhiChu NVARCHAR(200) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM ThongKeCoSoGo WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE ThongKeCoSoGo
+            SET CoSoId = @CoSoId,
+                LoaiKyBaoCaoId = @LoaiKyBaoCaoId,
+                Nam = @Nam,
+                KySo = @KySo,
+                GiaTriKy = @GiaTriKy,
+                DienTich = @DienTich,
+                SanLuong = @SanLuong,
+                GhiChu = @GhiChu
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO ThongKeCoSoGo (CoSoId, LoaiKyBaoCaoId, Nam, KySo, GiaTriKy, DienTich, SanLuong, GhiChu)
+        VALUES (@CoSoId, @LoaiKyBaoCaoId, @Nam, @KySo, @GiaTriKy, @DienTich, @SanLuong, @GhiChu)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   9) updateLoaiDongVat
+   ========================= */
+IF OBJECT_ID('updateLoaiDongVat') IS NOT NULL
+    DROP PROC updateLoaiDongVat
+GO
+
+CREATE PROC updateLoaiDongVat
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @TenKhoaHoc NVARCHAR(150) = NULL,
+    @TenTiengViet NVARCHAR(150) = NULL,
+    @NhomLoai NVARCHAR(100) = NULL,
+    @MucBaoTon NVARCHAR(100) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM LoaiDongVat WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE LoaiDongVat
+            SET TenKhoaHoc = @TenKhoaHoc,
+                TenTiengViet = @TenTiengViet,
+                NhomLoai = @NhomLoai,
+                MucBaoTon = @MucBaoTon
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO LoaiDongVat (TenKhoaHoc, TenTiengViet, NhomLoai, MucBaoTon)
+        VALUES (@TenKhoaHoc, @TenTiengViet, @NhomLoai, @MucBaoTon)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   10) updateThongKeSoLuongDongVat
+   ========================= */
+IF OBJECT_ID('updateThongKeSoLuongDongVat') IS NOT NULL
+    DROP PROC updateThongKeSoLuongDongVat
+GO
+
+CREATE PROC updateThongKeSoLuongDongVat
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @CoSoId INT = NULL,
+    @LoaiDongVatId INT = NULL,
+    @LoaiKyBaoCaoId INT = NULL,
+    @Nam INT = NULL,
+    @KySo INT = NULL,
+    @GiaTriKy DECIMAL(18,2) = NULL,
+    @SoDauKy DECIMAL(18,2) = NULL,
+    @SoCuoiKy DECIMAL(18,2) = NULL,
+    @GhiChu NVARCHAR(200) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM ThongKeSoLuongDongVat WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE ThongKeSoLuongDongVat
+            SET CoSoId = @CoSoId,
+                LoaiDongVatId = @LoaiDongVatId,
+                LoaiKyBaoCaoId = @LoaiKyBaoCaoId,
+                Nam = @Nam,
+                KySo = @KySo,
+                GiaTriKy = @GiaTriKy,
+                SoDauKy = @SoDauKy,
+                SoCuoiKy = @SoCuoiKy,
+                GhiChu = @GhiChu
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO ThongKeSoLuongDongVat (CoSoId, LoaiDongVatId, LoaiKyBaoCaoId, Nam, KySo, GiaTriKy, SoDauKy, SoCuoiKy, GhiChu)
+        VALUES (@CoSoId, @LoaiDongVatId, @LoaiKyBaoCaoId, @Nam, @KySo, @GiaTriKy, @SoDauKy, @SoCuoiKy, @GhiChu)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   11) updateBienDongSoLuongDongVat
+   ========================= */
+IF OBJECT_ID('updateBienDongSoLuongDongVat') IS NOT NULL
+    DROP PROC updateBienDongSoLuongDongVat
+GO
+
+CREATE PROC updateBienDongSoLuongDongVat
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @CoSoId INT = NULL,
+    @LoaiDongVatId INT = NULL,
+    @LoaiBienDongId INT = NULL,
+    @NgayBienDong DATE = NULL,
+    @SoLuong DECIMAL(18,2) = NULL,
+    @GhiChu NVARCHAR(200) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM BienDongSoLuongDongVat WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE BienDongSoLuongDongVat
+            SET CoSoId = @CoSoId,
+                LoaiDongVatId = @LoaiDongVatId,
+                LoaiBienDongId = @LoaiBienDongId,
+                NgayBienDong = @NgayBienDong,
+                SoLuong = @SoLuong,
+                GhiChu = @GhiChu
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO BienDongSoLuongDongVat (CoSoId, LoaiDongVatId, LoaiBienDongId, NgayBienDong, SoLuong, GhiChu)
+        VALUES (@CoSoId, @LoaiDongVatId, @LoaiBienDongId, @NgayBienDong, @SoLuong, @GhiChu)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO
+
+/* =========================
+   12) updateNhomNguoiDung
+   ========================= */
+IF OBJECT_ID('updateNhomNguoiDung') IS NOT NULL
+    DROP PROC updateNhomNguoiDung
+GO
+
+CREATE PROC updateNhomNguoiDung
+(
+    @action INT,
+    @Id INT OUTPUT,
+    @MaDonViId INT = NULL,
+    @TenNhom NVARCHAR(100) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN
+
+        IF @action = -1
+        BEGIN
+            DELETE FROM NhomNguoiDung WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        IF @action = 0
+        BEGIN
+            UPDATE NhomNguoiDung
+            SET MaDonViId = @MaDonViId,
+                TenNhom = @TenNhom
+            WHERE Id = @Id
+            COMMIT
+            RETURN
+        END
+
+        INSERT INTO NhomNguoiDung (MaDonViId, TenNhom)
+        VALUES (@MaDonViId, @TenNhom)
+
+        SET @Id = SCOPE_IDENTITY()
+        COMMIT
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK
+        THROW
+    END CATCH
+END
+GO

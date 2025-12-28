@@ -1,6 +1,6 @@
 ﻿{
   "#": {
-    "home": "Hành chính",
+    "home": "Trang chủ",
     "migrate": "Load database",
     "migrate/csharp": "C#",
     "migrate/s/model": "Models",
@@ -14,12 +14,11 @@
     "hanhchinh/huyen": "Đơn vị cấp huyện",
     "hanhchinh/xa": "Đơn vị cấp xã",
     "me/changepass": "Đổi mật khẩu",
-    "giongcay": "Giống cây trồng",
-    "giongcay/index": "Thông tin giống cây",
-    "giongcay/cssx": "Cơ sở sản xuất",
-    "sanxuat": "Sản xuất",
-    "tainguyen": "Tài nguyên",
-    "quanlycoso": "Quản lý cơ sở",
+    "coso": "Quản lý cơ sở",
+    "coso/index": "Danh sách cơ sở",
+    "coso/giong": "Cơ sở giống cây trồng",
+    "coso/go": "Cơ sở chế biến gỗ",
+    "coso/dongvat": "Cơ sở lưu giữ động vật",
     ".": ""
   },
   "actors": {
@@ -66,15 +65,23 @@
           }
         ]
       },
-      "giongcay": {
+      "coso": {
         "Childs": [
           {
-            "Text": "Dữ liệu",
-            "Refs": [ "giongcay/index", "giongcay/cssx" ]
+            "Text": "Tất cả cơ sở",
+            "Refs": [ "coso/index" ]
           },
           {
-            "Text": "Thống kê",
-            "Refs": [ "giongcay/index" ]
+            "Text": "Giống cây trồng",
+            "Refs": [ "coso/giong" ]
+          },
+          {
+            "Text": "Chế biến gỗ",
+            "Refs": [ "coso/go" ]
+          },
+          {
+            "Text": "Sinh vật rừng",
+            "Refs": [ "coso/dongvat" ]
           }
         ]
       }
@@ -89,26 +96,30 @@
           {
             "Text": "Hành chính",
             "Refs": [ "hanhchinh", "hanhchinh/huyen", "hanhchinh/xa" ]
-          },
+          },,
           {
             "Text": "Profile",
             "Refs": [ "me/changepass" ]
           }
         ]
       },
-      "quanlycoso": {
+      "coso": {
         "Childs": [
           {
-            "Text": "Quản lý giống cây trồng",
-            "Refs": [ "giongcay/index", "giongcay/cssx" ]
+            "Text": "Tất cả cơ sở",
+            "Refs": [ "coso/index" ]
           },
           {
-            "Text": "Quản lý cơ sở chế biến gỗ",
-            "Refs": [ "giongcay/index" ]
+            "Text": "Giống cây trồng",
+            "Refs": [ "coso/giong" ]
           },
           {
-            "Text": "Quản lý sinh vật rừng",
-            "Refs": [ "giongcay/index", "giongcay/cssx" ]
+            "Text": "Chế biến gỗ",
+            "Refs": [ "coso/go" ]
+          },
+          {
+            "Text": "Sinh vật rừng",
+            "Refs": [ "coso/dongvat" ]
           }
         ]
       }
