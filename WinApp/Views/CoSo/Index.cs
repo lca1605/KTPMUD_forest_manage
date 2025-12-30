@@ -71,8 +71,8 @@ namespace WinApp.Views.CoSo
                     Options = Provider.GetTable("LoaiCoSo").ToList<LoaiCoSo>(null, null) },
 
                 new TE { Name = "DonViId", Caption = "Đơn vị", Layout = 6,
-                    Type = "select", ValueName = "Id", DisplayName = "TenDayDu",
-                    Options = Models.DonVi.All },
+                    Type = "ssb", ValueName = "Id", DisplayName = "TenDayDu",
+                    Options = Models.DonVi.GetAll() },
 
                 new TE { Name = "DiaChi", Caption = "Địa chỉ", Layout = 12 },
                 new TE { Name = "NguoiDaiDien", Caption = "Người đại diện", Layout = 6 },

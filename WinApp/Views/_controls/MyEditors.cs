@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using SWC = System.Windows.Controls;
@@ -106,6 +109,7 @@ namespace Vst.Controls
             {"check", typeof(CheckBox) },
             {"number", typeof(NumberBox) },
             {"password", typeof(PasswordBox) },
+            {"ssb", typeof(SearchableSelectBox) },
         };
 
         EditorInfo _info;
@@ -424,7 +428,7 @@ namespace Vst.Controls
     {
         public SelectBox()
         {
-            input.IsEditable = true;
+            input.IsEditable = false;
             input.Padding = new Thickness(0);
         }
         protected override object GetEditValue()
@@ -526,5 +530,126 @@ namespace Vst.Controls
         //}
         protected override void SetEditValue(object v) => input.IsChecked = (bool?)v;
         protected override object GetEditValue() => input.IsChecked;
+    }
+
+    public class SearchableSelectBox : SelectBox
+    {
+        private System.Windows.Controls.TextBox _editableTextBox;
+
+        public SearchableSelectBox()
+        {
+            input.IsEditable = true;
+            input.IsTextSearchEnabled = false;
+            input.StaysOpenOnEdit = true;
+
+            input.Loaded += Input_Loaded;
+            input.LostFocus += OnInputLostFocus;
+        }
+
+        private void Input_Loaded(object sender, RoutedEventArgs e)
+        {
+            _editableTextBox = input.Template.FindName(
+                "PART_EditableTextBox",
+                input
+            ) as System.Windows.Controls.TextBox;
+
+            if (_editableTextBox != null)
+            {
+                _editableTextBox.TextChanged += EditableTextBox_TextChanged;
+            }
+        }
+
+        private void EditableTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string text = _editableTextBox.Text;
+
+            if (input.IsKeyboardFocusWithin && !input.IsDropDownOpen)
+            {
+                input.IsDropDownOpen = true;
+            }
+
+            var view = CollectionViewSource.GetDefaultView(input.ItemsSource);
+            if (view == null) return;
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                view.Filter = null;
+            }
+            else
+            {
+                view.Filter = obj =>
+                {
+                    string display = GetDisplayText(obj); 
+                    string source = RemoveVietnameseDiacritics(display);
+                    string target = RemoveVietnameseDiacritics(text);
+
+                    return source.Contains(target);
+
+                };
+            }
+
+            view.Refresh();
+        }
+
+        private void OnInputLostFocus(object sender, RoutedEventArgs e)
+        {
+            bool match = false;
+
+            if (input.ItemsSource != null)
+            {
+                foreach (var item in input.ItemsSource)
+                {
+                    if (GetDisplayText(item)
+                        .Equals(input.Text, StringComparison.OrdinalIgnoreCase))
+                    {
+                        input.SelectedItem = item;
+                        match = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!match)
+            {
+                input.SelectedIndex = -1;
+                input.Text = "";
+            }
+
+            var view = CollectionViewSource.GetDefaultView(input.ItemsSource);
+            if (view != null)
+                view.Filter = null;
+        }
+
+        private string GetDisplayText(object item)
+        {
+            if (item == null) return "";
+            if (string.IsNullOrEmpty(DisplayName)) return item.ToString();
+
+            var p = item.GetType().GetProperty(DisplayName);
+            return p?.GetValue(item)?.ToString() ?? item.ToString();
+        }
+
+        private string RemoveVietnameseDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
+            string normalized = text.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder();
+
+            foreach (char c in normalized)
+            {
+                var category = Char.GetUnicodeCategory(c);
+                if (category != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb
+                .ToString()
+                .Normalize(NormalizationForm.FormC)
+                .ToLowerInvariant();
+        }
     }
 }

@@ -8,27 +8,19 @@ namespace Models
 {
     partial class CoSo
     {
-        static List<ViewCoSo> _all;
-        static public List<ViewCoSo> All
-        {
-            get
-            {
-                if (_all == null || _all.Count == 0)
-                    _all = Provider.Select<ViewCoSo>();
-                return _all;
-            }
-        }
-
         static public int? LoaiCoSoDangXuLy { get; set; }
 
         static public List<ViewCoSo> DanhSach(int? loaiCoSoId)
         {
-            if (loaiCoSoId == null)
-                return All;
+            var all = Provider.Select<ViewCoSo>();
 
-            var lst = new List<ViewCoSo>();
-            lst.AddRange(All.Where(x => x.LoaiCoSoId == loaiCoSoId).OrderBy(x => x.Ten));
-            return lst;
+            if (loaiCoSoId == null)
+                return all;
+
+            return all
+                .Where(x => x.LoaiCoSoId == loaiCoSoId)
+                .OrderBy(x => x.Ten)
+                .ToList();
         }
 
         static LoaiCoSo[] _loaiCoSo;

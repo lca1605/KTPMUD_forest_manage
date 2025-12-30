@@ -12,25 +12,23 @@ namespace Models
     }
     partial class DonVi
     {
-        static List<ViewDonVi> _all;
-        static public List<ViewDonVi> All
+        static public List<ViewDonVi> GetAll()
         {
-            get
-            {
-                if (_all == null || _all.Count == 0)
-                    _all = Provider.Select<ViewDonVi>();
-                return _all;
-            }
+            return Provider.Select<ViewDonVi>();
         }
-        static public int? CapHanhChinhDangXuLy { get; set; }        
+
+        static public int? CapHanhChinhDangXuLy { get; set; }
         static public List<ViewDonVi> DanhSach(int? cap)
         {
-            if (cap == null)
-                return All;
+            var all = GetAll();
 
-            var lst = new List<ViewDonVi>();
-            lst.AddRange(All.Where(x => x.HanhChinhId == cap).OrderBy(x => x.Ten));
-            return lst;
+            if (cap == null)
+                return all;
+
+            return all
+                .Where(x => x.HanhChinhId == cap)
+                .OrderBy(x => x.Ten)
+                .ToList();
         }
 
         static HanhChinh[] _hanhChinh;

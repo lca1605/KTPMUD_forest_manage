@@ -88,6 +88,7 @@ namespace Models
     public class TenHanhChinh
     {
         public string Ten { get; set; }
+        public int HanhChinhId { get; set; }
     }
 
     public partial class ViewDonVi

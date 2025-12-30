@@ -7,18 +7,17 @@ using Models;
 
 namespace WinApp.Controllers
 {
-    // KẾ THỪA DataController<CoSo> giống HanhChinhController
-    partial class CoSoController : DataController<CoSo>
+    partial class CoSoController : DataController<ViewCoSo>
     {
-        protected override CoSo CreateEntity() => new CoSo { LoaiCoSoId = CoSo.LoaiCoSoDangXuLy };
+        protected override ViewCoSo CreateEntity() => new ViewCoSo { LoaiCoSoId = CoSo.LoaiCoSoDangXuLy };
 
-        public object Add(CoSo one) => View(new EditContext { Model = one, Action = EditActions.Insert });
+        public object Add(ViewCoSo one) => View(new EditContext { Model = one, Action = EditActions.Insert });
 
         public override object Index()
         {
             CheckUserActivity();
-            // Trả về tất cả cơ sở cho View mới
-            return View(CoSo.All);
+            return View(CoSo.DanhSach(CoSo.LoaiCoSoDangXuLy));
+
         }
 
         protected object Select(int? loaiCoSoId)
@@ -48,9 +47,52 @@ namespace WinApp.Controllers
         {
             if (UpdateContext.Action == EditActions.Delete)
             {
-                message = $"Không thể xóa {((CoSo)UpdateContext.Model).Ten}";
+                message = $"Không thể xóa {((ViewCoSo)UpdateContext.Model).Ten}";
             }
             return base.Error(code, message);
         }
+
+        #region Không dùng Procedure - Insert/Update/Delete trực tiếp
+        DataSchema.Table CoSoDb => Provider.GetTable<CoSo>();
+
+        protected override string GetProcName() => null;
+
+        protected override void TryInsert(ViewCoSo e)
+        {
+            var coSo = new CoSo
+            {
+                DonViId = e.DonViId,
+                LoaiCoSoId = e.LoaiCoSoId,
+                Ten = e.Ten,
+                DiaChi = e.DiaChi,
+                SDT = e.SDT,
+                NguoiDaiDien = e.NguoiDaiDien
+            };
+
+            var sql = CoSoDb.CreateInsertSql(coSo);
+            ExecSQL(sql);
+        }
+
+        protected override void TryUpdate(ViewCoSo e)
+        {
+            var coSo = new CoSo
+            {
+                Id = e.Id,
+                DonViId = e.DonViId,
+                LoaiCoSoId = e.LoaiCoSoId,
+                Ten = e.Ten,
+                DiaChi = e.DiaChi,
+                SDT = e.SDT,
+                NguoiDaiDien = e.NguoiDaiDien
+            };
+
+            ExecSQL(CoSoDb.CreateUpdateSql(coSo));
+        }
+
+        protected override void TryDelete(ViewCoSo e)
+        {
+            ExecSQL(CoSoDb.CreateDeleteSql(new CoSo { Id = e.Id }));
+        }
+        #endregion
     }
 }

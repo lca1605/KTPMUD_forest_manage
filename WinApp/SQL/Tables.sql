@@ -44,26 +44,34 @@ CREATE TABLE HanhChinh
 )
 GO
 
-INSERT INTO HanhChinh VALUES
-    (N'Tỉnh/Thành', NULL),
-    (N'Quận/Huyện', 1),
-    (N'Phường/Xã', 2),
-    (N'Tổ/Thôn', 3)
+-- Bật IDENTITY_INSERT để ép Id = 0 cho Việt Nam
+SET IDENTITY_INSERT HanhChinh ON;
+INSERT INTO HanhChinh (Id, Ten, TrucThuocId) VALUES (0, N'Việt Nam', NULL);
+SET IDENTITY_INSERT HanhChinh OFF;
+GO
+
+-- Chèn các cấp hành chính (Identity tự tăng 1, 2, 3...)
+INSERT INTO HanhChinh (Ten, TrucThuocId) VALUES
+    (N'Tỉnh/Thành phố', 0),  -- Id 1: Trực thuộc Việt Nam (Id 0)
+    (N'Quận/Huyện', 1),       -- Id 2: Trực thuộc Tỉnh (Id 1)
+    (N'Phường/Xã', 2),        -- Id 3: Trực thuộc Huyện (Id 2)
+    (N'Tổ/Thôn/Ấp', 3)        -- Id 4: Trực thuộc Xã (Id 3)
 GO
 
 /* =========================
    4) TenHanhChinh
    ========================= */
-CREATE TABLE TenHanhChinh
-( Ten NVARCHAR(50)
-)
+CREATE TABLE TenHanhChinh (
+    Ten NVARCHAR(50),
+    HanhChinhId INT -- Liên kết với Id của bảng HanhChinh
+);
 GO
 
-INSERT INTO TenHanhChinh VALUES
-    (N'Ấp'), (N'Bản'), (N'Buôn'), (N'Huyện'), (N'Làng'),
-    (N'Phường'), (N'Quận'), (N'Sóc'), (N'Thành phố'),
-    (N'Thị xã'), (N'Thị trấn'), (N'Thôn'), (N'Tỉnh'),
-    (N'Tổ'), (N'Xã')
+INSERT INTO TenHanhChinh VALUES 
+(N'Tỉnh', 1), (N'Thành phố trực thuộc TW', 1),
+(N'Quận', 2), (N'Huyện', 2), (N'Thị xã', 2), (N'Thành phố thuộc tỉnh', 2),
+(N'Phường', 3), (N'Xã', 3), (N'Thị trấn', 3),
+(N'Thôn', 4), (N'Tổ dân phố', 4), (N'Ấp', 4), (N'Bản', 4);
 GO
 
 /* =========================

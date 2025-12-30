@@ -60,7 +60,7 @@ namespace WinApp.Views.HanhChinh
             Body.Children.Clear();
 
             _current = null;
-            foreach (var item in DonVi.All.Where(condition).OrderBy(x => x.Ten))
+            foreach (var item in DonVi.GetAll().Where(condition).OrderBy(x => x.Ten))
             {
                 var line = new DonViItemView {
                     Text = item.TenDayDu,
