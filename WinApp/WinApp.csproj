@@ -62,6 +62,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Actors\User.cs" />
+    <Compile Include="App_Data\ActionCore\%28Document%29.cs" />
+    <Compile Include="App_Data\ActionCore\Config.cs" />
+    <Compile Include="App_Data\Migration\CodeGenerator.cs" />
+    <Compile Include="App_Data\Migration\Provider.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HanhChinhController.cs" />
@@ -72,15 +76,16 @@
     <Compile Include="Controllers\MigrateResult.cs" />
     <Compile Include="Controllers\CoSoController.cs" />
     <Compile Include="Controllers\TaiKhoanController.cs" />
-    <Compile Include="Models\%28Document%29.cs" />
-    <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\CoSo.cs" />
-    <Compile Include="Models\DbModels.cs" />
-    <Compile Include="Models\Migration\CodeGenerator.cs" />
-    <Compile Include="Models\Config.cs" />
-    <Compile Include="Models\DonVi.cs" />
-    <Compile Include="Models\Migration\Provider.cs" />
+    <Compile Include="Models\CoSoQuanLy\CoSo.cs" />
+    <Compile Include="Models\CoSoQuanLy\DongVat.cs" />
+    <Compile Include="Models\CoSoQuanLy\GiongCay.cs" />
+    <Compile Include="Models\CoSoQuanLy\Go.cs" />
+    <Compile Include="Models\User\NhomNguoiDung.cs" />
+    <Compile Include="Models\HanhChinhQuanLy\DonViHanhChinh.cs" />
     <Compile Include="Models\UpdateContext.cs" />
+    <Compile Include="Models\User\TaiKhoan.cs" />
+    <Compile Include="Services\CoSoService.cs" />
+    <Compile Include="Services\DonViService.cs" />
     <Compile Include="Views\Admin\Test.cs" />
     <Compile Include="Views\BaseView.cs" />
     <Compile Include="Views\CoSo\DongVat.cs" />
@@ -101,6 +106,9 @@
       <DependentUpon>MigrateLayout.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TaiKhoan\TaiKhoanManagerView.cs" />
+    <Compile Include="Views\_layouts\BaoCaoViewLayout.xaml.cs">
+      <DependentUpon>BaoCaoViewLayout.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\_layouts\PageHeader.xaml.cs">
       <DependentUpon>PageHeader.xaml</DependentUpon>
     </Compile>
@@ -164,6 +172,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\_layouts\BaoCaoViewLayout.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\_layouts\PageHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -203,12 +215,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="App_Data\Actions.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="App_Data\Config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="App_Data\ActionData\Actions.json" />
+    <None Include="App_Data\ActionData\Config.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -220,6 +228,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Resource Include="App_Data\301124_version moi.txt" />
     <Content Include="SQL\Procs.sql" />
     <Content Include="SQL\Tables.sql" />
   </ItemGroup>

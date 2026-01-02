@@ -2,7 +2,7 @@
 GO
 
 /* =========================
-   1) HoSo
+   1) User
    ========================= */
 CREATE TABLE HoSo
 ( Id INT PRIMARY KEY IDENTITY
@@ -18,9 +18,6 @@ INSERT INTO HoSo VALUES
     (N'Đào Lê Thu Thảo', '0989708960', 'thao.daolethu@hust.edu.vn', NULL)
 GO
 
-/* =========================
-   2) Quyen
-   ========================= */
 CREATE TABLE Quyen
 ( Id INT PRIMARY KEY IDENTITY
 , Ten NVARCHAR(50)
@@ -34,8 +31,40 @@ INSERT INTO Quyen VALUES
     (N'Cán bộ nghiệp vụ', 'Staff')
 GO
 
+CREATE TABLE TaiKhoan
+( TenDangNhap VARCHAR(50) PRIMARY KEY
+, MatKhau VARCHAR(255) NOT NULL
+, QuyenId INT NOT NULL FOREIGN KEY REFERENCES Quyen(Id)
+, HoSoId INT NULL FOREIGN KEY REFERENCES HoSo(Id)
+, LanCuoiHoatDong DATETIME NULL
+, MaDonViId INT NULL FOREIGN KEY REFERENCES DonVi(Id)
+)
+GO
+
+INSERT INTO TaiKhoan VALUES
+    ('dev', '1234', 1, NULL, NULL, NULL),
+    ('admin', '1234', 2, NULL, NULL, NULL),
+    ('0989154248', '1234', 3, 1, NULL, NULL),
+    ('0989708960', '1234', 3, 2, NULL, NULL),
+    ('cb_hanoi', '123', 3, NULL, NULL, 1),
+    ('cb_thaibinh', '123', 3, NULL, NULL, 5),
+    ('cb_hbt_01', '123', 3, NULL, NULL, 2),
+    ('cb_thaithuy', '123', 3, NULL, NULL, 6),
+    ('cb_bk_01', '123', 3, NULL, NULL, 3),
+    ('cb_bk_02', '123', 3, NULL, NULL, 3),
+    ('cb_thuyhai', '123', 3, NULL, NULL, 7)
+GO
+
+CREATE VIEW ViewHoSo AS
+    SELECT HoSo.*, TaiKhoan.TenDangNhap AS TenDangNhap, MatKhau, QuyenId, 
+           Quyen.Ten AS Quyen, TaiKhoan.LanCuoiHoatDong 
+    FROM TaiKhoan
+    INNER JOIN Quyen ON QuyenId = Quyen.Id
+    INNER JOIN HoSo ON HoSoId = HoSo.Id
+GO
+
 /* =========================
-   3) HanhChinh (4 cấp)
+   2) HanhChinh (4 cấp)
    ========================= */
 CREATE TABLE HanhChinh
 ( Id INT PRIMARY KEY IDENTITY
@@ -58,12 +87,9 @@ INSERT INTO HanhChinh (Ten, TrucThuocId) VALUES
     (N'Tổ/Thôn/Ấp', 3)        -- Id 4: Trực thuộc Xã (Id 3)
 GO
 
-/* =========================
-   4) TenHanhChinh
-   ========================= */
 CREATE TABLE TenHanhChinh (
     Ten NVARCHAR(50),
-    HanhChinhId INT -- Liên kết với Id của bảng HanhChinh
+    HanhChinhId INT
 );
 GO
 
@@ -74,9 +100,6 @@ INSERT INTO TenHanhChinh VALUES
 (N'Thôn', 4), (N'Tổ dân phố', 4), (N'Ấp', 4), (N'Bản', 4);
 GO
 
-/* =========================
-   5) DonVi (cây đơn vị)
-   ========================= */
 CREATE TABLE DonVi
 ( Id INT PRIMARY KEY IDENTITY
 , Ten NVARCHAR(50) NOT NULL
@@ -105,64 +128,7 @@ CREATE VIEW ViewDonVi AS
 GO
 
 /* =========================
-   6) TaiKhoan - MERGE CẢ 2 PHIÊN BẢN
-   Giữ tên biến cũ + thêm trường mới
-   ========================= */
-CREATE TABLE TaiKhoan
-( Ten VARCHAR(50) PRIMARY KEY
-, MatKhau VARCHAR(255) NOT NULL
-, QuyenId INT NOT NULL FOREIGN KEY REFERENCES Quyen(Id)
-, HoSoId INT NULL FOREIGN KEY REFERENCES HoSo(Id)
-, LanCuoiHoatDong DATETIME NULL
-, TrangThai NVARCHAR(20) NULL DEFAULT N'Offline'
-, MaDonViId INT NULL FOREIGN KEY REFERENCES DonVi(Id)
-, HoTen NVARCHAR(100) NULL
-)
-GO
-
-INSERT INTO TaiKhoan VALUES
-    ('dev', '1234', 1, NULL, NULL, N'Offline', NULL, NULL),
-    ('admin', '1234', 2, NULL, NULL, N'Offline', NULL, N'Quản trị hệ thống'),
-    ('0989154248', '1234', 3, 1, NULL, N'Offline', NULL, NULL),
-    ('0989708960', '1234', 3, 2, NULL, N'Offline', NULL, NULL),
-    
-    -- Thêm cán bộ từ code mới
-    ('cb_hanoi', '123', 3, NULL, NULL, N'Offline', 1, N'Cán bộ Thành phố Hà Nội'),
-    ('cb_thaibinh', '123', 3, NULL, NULL, N'Offline', 5, N'Cán bộ Tỉnh Thái Bình'),
-    ('cb_hbt_01', '123', 3, NULL, NULL, N'Offline', 2, N'Cán bộ Quận Hai Bà Trưng'),
-    ('cb_thaithuy', '123', 3, NULL, NULL, N'Offline', 6, N'Cán bộ Huyện Thái Thụy'),
-    ('cb_bk_01', '123', 3, NULL, NULL, N'Offline', 3, N'Cán bộ Phường Bách Khoa'),
-    ('cb_bk_02', '123', 3, NULL, NULL, N'Offline', 3, N'Cán bộ Phường Bách Khoa'),
-    ('cb_thuyhai', '123', 3, NULL, NULL, N'Offline', 7, N'Cán bộ Xã Thụy Hải')
-GO
-
-CREATE VIEW ViewHoSo AS
-    SELECT HoSo.*, TaiKhoan.Ten AS TenDangNhap, MatKhau, QuyenId, 
-           Quyen.Ten AS Quyen, TaiKhoan.LanCuoiHoatDong 
-    FROM TaiKhoan
-    INNER JOIN Quyen ON QuyenId = Quyen.Id
-    INNER JOIN HoSo ON HoSoId = HoSo.Id
-GO
-
-/* =========================
-   7) GiongCay - GIỮ CẢ 2
-   ========================= */
-CREATE TABLE GiongCay
-( Id INT PRIMARY KEY IDENTITY
-, Ten NVARCHAR(50)
-, Nguon NVARCHAR(255)
-)
-GO
-
-INSERT INTO GiongCay VALUES
-    (N'Vải', N'Hải Dương'),
-    (N'Nhãn', N'Hưng Yên'),
-    (N'Mít', N'Nam Định'),
-    (N'Dừa', N'Phú Xuyên')
-GO
-
-/* =========================
-   8) NhomNguoiDung
+   3) NhomNguoiDung
    ========================= */
 CREATE TABLE NhomNguoiDung
 ( Id INT PRIMARY KEY IDENTITY
@@ -184,9 +150,6 @@ ALTER TABLE NhomNguoiDung
 ADD CONSTRAINT UQ_NhomNguoiDung_MaDonVi UNIQUE (MaDonViId)
 GO
 
-/* =========================
-   9) NguoiDungTrongNhom
-   ========================= */
 CREATE TABLE NguoiDungTrongNhom
 ( UserName VARCHAR(50) NOT NULL FOREIGN KEY REFERENCES TaiKhoan(Ten)
 , GroupId INT NOT NULL FOREIGN KEY REFERENCES NhomNguoiDung(Id)
@@ -208,9 +171,6 @@ INSERT INTO NguoiDungTrongNhom VALUES
     ('cb_thuyhai', 6)
 GO
 
-/* =========================
-   10) TacDong (CRUD + Duyệt)
-   ========================= */
 CREATE TABLE TacDong
 ( Id INT PRIMARY KEY IDENTITY
 , Ten NVARCHAR(50) NOT NULL
@@ -225,9 +185,6 @@ INSERT INTO TacDong VALUES
     (N'Duyệt')
 GO
 
-/* =========================
-   11) QuyenNhom
-   ========================= */
 CREATE TABLE QuyenNhom
 ( GroupId INT NOT NULL FOREIGN KEY REFERENCES NhomNguoiDung(Id)
 , TacDongId INT NOT NULL FOREIGN KEY REFERENCES TacDong(Id)
@@ -254,7 +211,7 @@ INSERT INTO QuyenNhom VALUES
 GO
 
 /* =========================
-   12) LoaiKyBaoCao
+   LoaiKyBaoCao
    ========================= */
 CREATE TABLE LoaiKyBaoCao
 ( Id INT PRIMARY KEY IDENTITY
@@ -269,7 +226,7 @@ INSERT INTO LoaiKyBaoCao VALUES
 GO
 
 /* =========================
-   13) LoaiCoSo
+   4) CoSo
    ========================= */
 CREATE TABLE LoaiCoSo
 ( Id INT PRIMARY KEY IDENTITY
@@ -283,9 +240,6 @@ INSERT INTO LoaiCoSo VALUES
     (N'Cơ sở lưu giữ động vật')
 GO
 
-/* =========================
-   14) CoSo (bảng cha)
-   ========================= */
 CREATE TABLE CoSo
 ( Id INT PRIMARY KEY IDENTITY
 , DonViId INT NOT NULL FOREIGN KEY REFERENCES DonVi(Id)
@@ -306,20 +260,83 @@ INSERT INTO CoSo VALUES
     (4, 3, N'Điểm Lưu Giữ Đồng Tâm 01', N'Đồng Tâm, Hai Bà Trưng, Hà Nội', '0903000002', N'Hoàng Đức Long')
 GO
 
+CREATE VIEW ViewCoSo AS
+    SELECT 
+        CoSo.*,
+        DonVi.Ten AS TenDonVi,
+        LoaiCoSo.Ten AS TenLoaiCoSo
+    FROM CoSo
+    INNER JOIN DonVi ON CoSo.DonViId = DonVi.Id
+    INNER JOIN LoaiCoSo ON CoSo.LoaiCoSoId = LoaiCoSo.Id
+GO
+
 /* =========================
-   15) 3 bảng con CoSo (1-1)
+   5) CoSoGiongCayTrong
    ========================= */
-CREATE TABLE CoSoGiongCayTrong
-( CoSoId INT PRIMARY KEY FOREIGN KEY REFERENCES CoSo(Id)
+
+CREATE TABLE GiongCay
+( Id INT PRIMARY KEY IDENTITY
+, Ten NVARCHAR(50)
+, Nguon NVARCHAR(255)
+, MoTa NVARCHAR(200) NULL
 )
 GO
 
-CREATE TABLE CoSoLuuGiuDongVat
-( CoSoId INT PRIMARY KEY FOREIGN KEY REFERENCES CoSo(Id)
+INSERT INTO GiongCay VALUES
+    (N'Vải', N'Hải Dương'),
+    (N'Nhãn', N'Hưng Yên'),
+    (N'Mít', N'Nam Định'),
+    (N'Dừa', N'Phú Xuyên'),
+    (N'Keo lai', N'Giống keo phục vụ trồng rừng'),
+    (N'Thong ma', N'Giống thông'),
+    (N'Bach dan', N'Giống bạch đàn')
+GO
+
+CREATE TABLE CoSoGiong_LoaiGiong
+( Id INT PRIMARY KEY IDENTITY
+, CoSoId INT NOT NULL FOREIGN KEY REFERENCES CoSo(Id)
+, LoaiGiongId INT NOT NULL FOREIGN KEY REFERENCES LoaiGiongCayTrong(Id)
+, GhiChu NVARCHAR(200) NULL
 )
 GO
 
-CREATE TABLE LoaiHinhSanXuatGo
+CREATE TABLE ThongKeCoSoGiong
+( Id INT PRIMARY KEY IDENTITY
+, CoSoId INT NOT NULL FOREIGN KEY REFERENCES CoSo(Id)
+, LoaiKyBaoCaoId INT NOT NULL FOREIGN KEY REFERENCES LoaiKyBaoCao(Id)
+, Nam INT NOT NULL
+, KySo INT NULL
+, GiaTriKy DECIMAL(18,2) NULL
+, DienTich DECIMAL(18,2) NULL
+, SanLuong DECIMAL(18,2) NULL
+, GhiChu NVARCHAR(200) NULL
+)
+GO
+
+INSERT INTO CoSoGiong_LoaiGiong VALUES
+    (1, 1, N'Sản xuất theo mùa'),
+    (1, 2, N'Ưu tiên dự án trồng rừng'),
+    (2, 1, N'Keo lai là chủ lực'),
+    (2, 3, N'Bổ sung bạch đàn')
+GO
+
+INSERT INTO ThongKeCoSoGiong VALUES
+    (1, 1, 2025, 1, 50000000, 3.50, 20000, N'Tháng 1/2025'),
+    (1, 1, 2025, 2, 55000000, 3.60, 22000, N'Tháng 2/2025'),
+    (1, 1, 2025, 3, 60000000, 3.70, 24000, N'Tháng 3/2025'),
+    (2, 1, 2025, 1, 40000000, 2.80, 16000, N'Tháng 1/2025'),
+    (2, 1, 2025, 2, 42000000, 2.90, 17000, N'Tháng 2/2025'),
+    (2, 1, 2025, 3, 45000000, 3.00, 18000, N'Tháng 3/2025'),
+    (1, 2, 2025, 1, 165000000, 10.80, 66000, N'Tổng Q1/2025'),
+    (2, 2, 2025, 1, 127000000, 8.70, 51000, N'Tổng Q1/2025'),
+    (1, 3, 2024, NULL, 500000000, 40.00, 260000, N'Năm 2024'),
+    (2, 3, 2024, NULL, 380000000, 32.00, 210000, N'Năm 2024')
+GO
+
+/* =========================
+   6) CoSoGo
+   ========================= */
+   CREATE TABLE LoaiHinhSanXuatGo
 ( Id INT PRIMARY KEY IDENTITY
 , Ten NVARCHAR(100) NOT NULL
 , MoTa NVARCHAR(200) NULL
@@ -352,46 +369,11 @@ CREATE TABLE CoSoCheBienGo
 )
 GO
 
-/* =========================
-   16) LoaiGiongCayTrong - BẢNG MỚI
-   ========================= */
-CREATE TABLE LoaiGiongCayTrong
-( Id INT PRIMARY KEY IDENTITY
-, Ten NVARCHAR(100) NOT NULL
-, MoTa NVARCHAR(200) NULL
-)
+INSERT INTO CoSoCheBienGo VALUES
+    (3, 2, 2),
+    (4, 1, 1)
 GO
 
-INSERT INTO LoaiGiongCayTrong VALUES
-    (N'Keo lai', N'Giống keo phục vụ trồng rừng'),
-    (N'Thong ma', N'Giống thông'),
-    (N'Bach dan', N'Giống bạch đàn')
-GO
-
-CREATE TABLE CoSoGiong_LoaiGiong
-( Id INT PRIMARY KEY IDENTITY
-, CoSoId INT NOT NULL FOREIGN KEY REFERENCES CoSo(Id)
-, LoaiGiongId INT NOT NULL FOREIGN KEY REFERENCES LoaiGiongCayTrong(Id)
-, GhiChu NVARCHAR(200) NULL
-)
-GO
-
-CREATE TABLE ThongKeCoSoGiong
-( Id INT PRIMARY KEY IDENTITY
-, CoSoId INT NOT NULL FOREIGN KEY REFERENCES CoSo(Id)
-, LoaiKyBaoCaoId INT NOT NULL FOREIGN KEY REFERENCES LoaiKyBaoCao(Id)
-, Nam INT NOT NULL
-, KySo INT NULL
-, GiaTriKy DECIMAL(18,2) NULL
-, DienTich DECIMAL(18,2) NULL
-, SanLuong DECIMAL(18,2) NULL
-, GhiChu NVARCHAR(200) NULL
-)
-GO
-
-/* =========================
-   17) ThongKeCoSoGo
-   ========================= */
 CREATE TABLE ThongKeCoSoGo
 ( Id INT PRIMARY KEY IDENTITY
 , CoSoId INT NOT NULL FOREIGN KEY REFERENCES CoSo(Id)
@@ -405,8 +387,21 @@ CREATE TABLE ThongKeCoSoGo
 )
 GO
 
+INSERT INTO ThongKeCoSoGo VALUES
+    (3, 1, 2025, 1, 70000000, 1.20, 35.00, N'Tháng 1/2025'),
+    (3, 1, 2025, 2, 75000000, 1.20, 38.00, N'Tháng 2/2025'),
+    (3, 1, 2025, 3, 80000000, 1.20, 40.00, N'Tháng 3/2025'),
+    (4, 1, 2025, 1, 50000000, 0.80, 22.00, N'Tháng 1/2025'),
+    (4, 1, 2025, 2, 52000000, 0.80, 23.00, N'Tháng 2/2025'),
+    (4, 1, 2025, 3, 54000000, 0.80, 24.00, N'Tháng 3/2025'),
+    (3, 2, 2025, 1, 225000000, 3.60, 113.00, N'Tổng Q1/2025'),
+    (4, 2, 2025, 1, 156000000, 2.40, 69.00, N'Tổng Q1/2025'),
+    (3, 3, 2024, NULL, 900000000, 12.00, 520.00, N'Năm 2024'),
+    (4, 3, 2024, NULL, 650000000, 9.00, 410.00, N'Năm 2024')
+GO
+
 /* =========================
-   18) LoaiDongVat + ThongKe
+   7) CoSoDongVat
    ========================= */
 CREATE TABLE LoaiDongVat
 ( Id INT PRIMARY KEY IDENTITY
@@ -461,62 +456,6 @@ CREATE TABLE BienDongSoLuongDongVat
 )
 GO
 
-/* =========================
-   19) Đổ dữ liệu vào 3 bảng con
-   ========================= */
-INSERT INTO CoSoGiongCayTrong VALUES (1), (2)
-GO
-
-INSERT INTO CoSoCheBienGo VALUES
-    (3, 2, 2),
-    (4, 1, 1)
-GO
-
-INSERT INTO CoSoLuuGiuDongVat VALUES (5), (6)
-GO
-
-/* =========================
-   20) Data mẫu: Giống cây
-   ========================= */
-INSERT INTO CoSoGiong_LoaiGiong VALUES
-    (1, 1, N'Sản xuất theo mùa'),
-    (1, 2, N'Ưu tiên dự án trồng rừng'),
-    (2, 1, N'Keo lai là chủ lực'),
-    (2, 3, N'Bổ sung bạch đàn')
-GO
-
-INSERT INTO ThongKeCoSoGiong VALUES
-    (1, 1, 2025, 1, 50000000, 3.50, 20000, N'Tháng 1/2025'),
-    (1, 1, 2025, 2, 55000000, 3.60, 22000, N'Tháng 2/2025'),
-    (1, 1, 2025, 3, 60000000, 3.70, 24000, N'Tháng 3/2025'),
-    (2, 1, 2025, 1, 40000000, 2.80, 16000, N'Tháng 1/2025'),
-    (2, 1, 2025, 2, 42000000, 2.90, 17000, N'Tháng 2/2025'),
-    (2, 1, 2025, 3, 45000000, 3.00, 18000, N'Tháng 3/2025'),
-    (1, 2, 2025, 1, 165000000, 10.80, 66000, N'Tổng Q1/2025'),
-    (2, 2, 2025, 1, 127000000, 8.70, 51000, N'Tổng Q1/2025'),
-    (1, 3, 2024, NULL, 500000000, 40.00, 260000, N'Năm 2024'),
-    (2, 3, 2024, NULL, 380000000, 32.00, 210000, N'Năm 2024')
-GO
-
-/* =========================
-   21) Data mẫu: Gỗ
-   ========================= */
-INSERT INTO ThongKeCoSoGo VALUES
-    (3, 1, 2025, 1, 70000000, 1.20, 35.00, N'Tháng 1/2025'),
-    (3, 1, 2025, 2, 75000000, 1.20, 38.00, N'Tháng 2/2025'),
-    (3, 1, 2025, 3, 80000000, 1.20, 40.00, N'Tháng 3/2025'),
-    (4, 1, 2025, 1, 50000000, 0.80, 22.00, N'Tháng 1/2025'),
-    (4, 1, 2025, 2, 52000000, 0.80, 23.00, N'Tháng 2/2025'),
-    (4, 1, 2025, 3, 54000000, 0.80, 24.00, N'Tháng 3/2025'),
-    (3, 2, 2025, 1, 225000000, 3.60, 113.00, N'Tổng Q1/2025'),
-    (4, 2, 2025, 1, 156000000, 2.40, 69.00, N'Tổng Q1/2025'),
-    (3, 3, 2024, NULL, 900000000, 12.00, 520.00, N'Năm 2024'),
-    (4, 3, 2024, NULL, 650000000, 9.00, 410.00, N'Năm 2024')
-GO
-
-/* =========================
-   22) Data mẫu: Động vật
-   ========================= */
 INSERT INTO ThongKeSoLuongDongVat VALUES
     (5, 1, 2, 2025, 1, NULL, 5, 6, N'Q1/2025 - Cu li (Thụy Hải)'),
     (5, 2, 2, 2025, 1, NULL, 10, 9, N'Q1/2025 - Khi vàng (Thụy Hải)'),
@@ -527,17 +466,4 @@ INSERT INTO BienDongSoLuongDongVat VALUES
     (5, 1, 3, '2025-02-10', 1, N'Tiếp nhận thêm 1 cá thể cu li'),
     (5, 2, 4, '2025-03-01', 1, N'Bàn giao/thả tự nhiên 1 cá thể'),
     (6, 3, 3, '2025-01-15', 2, N'Tiếp nhận 2 cá thể trăn đất')
-GO
-
-/* =========================
-   23) VIEW cho CoSo
-   ========================= */
-CREATE VIEW ViewCoSo AS
-    SELECT 
-        CoSo.*,
-        DonVi.Ten AS TenDonVi,
-        LoaiCoSo.Ten AS TenLoaiCoSo
-    FROM CoSo
-    INNER JOIN DonVi ON CoSo.DonViId = DonVi.Id
-    INNER JOIN LoaiCoSo ON CoSo.LoaiCoSoId = LoaiCoSo.Id
 GO

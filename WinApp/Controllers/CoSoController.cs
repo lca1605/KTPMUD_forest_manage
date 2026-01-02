@@ -4,25 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Models;
+using Services;
 
 namespace WinApp.Controllers
 {
     partial class CoSoController : DataController<ViewCoSo>
     {
-        protected override ViewCoSo CreateEntity() => new ViewCoSo { LoaiCoSoId = CoSo.LoaiCoSoDangXuLy };
+        protected override ViewCoSo CreateEntity() => new ViewCoSo { LoaiCoSoId = CoSoService.LoaiCoSoDangXuLy };
 
         public object Add(ViewCoSo one) => View(new EditContext { Model = one, Action = EditActions.Insert });
 
         public override object Index()
         {
             CheckUserActivity();
-            return View(CoSo.DanhSach(CoSo.LoaiCoSoDangXuLy));
+            return View(CoSoService.DanhSach(CoSoService.LoaiCoSoDangXuLy));
 
         }
 
         protected object Select(int? loaiCoSoId)
         {
-            return CoSo.DanhSach(CoSo.LoaiCoSoDangXuLy = loaiCoSoId);
+            return CoSoService.DanhSach(CoSoService.LoaiCoSoDangXuLy = loaiCoSoId);
         }
 
         public object Giong()

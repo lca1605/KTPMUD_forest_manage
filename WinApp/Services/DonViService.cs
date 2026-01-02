@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Models;
 
-namespace Models
+namespace Services
 {
-    partial class ViewDonVi
-    {
-        public string TenDayDu => $"{TenHanhChinh} {Ten}";
-    }
-    partial class DonVi
+    partial class DonViService
     {
         static public List<ViewDonVi> GetAll()
         {

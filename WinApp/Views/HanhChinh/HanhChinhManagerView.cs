@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Vst.Controls;
+using Services;
 
 namespace WinApp.Views.HanhChinh 
 { 
@@ -49,7 +50,7 @@ namespace WinApp.Views.HanhChinh
             context.Editors = new object[] 
             { 
                 new TE { Name = "HanhChinhId", Caption = "Cấp hành chính", Layout = 4, Type = "select", ValueName = "Id", DisplayName = "Ten", Options = Provider.GetTable("HanhChinh").ToList<Models.HanhChinh>(null, null).Where(x => x.Id > 0).ToList() }, 
-                new TE { Name = "TrucThuocId", Caption = "Trực thuộc", Layout = 8, Type = "ssb", ValueName = "Id", DisplayName = "TenDayDu", Options = Models.DonVi.GetAll(), }, 
+                new TE { Name = "TrucThuocId", Caption = "Trực thuộc", Layout = 8, Type = "ssb", ValueName = "Id", DisplayName = "TenDayDu", Options = DonViService.GetAll(), }, 
                 new TE { Name = "TenHanhChinh", Caption = "Tên hành chính", Layout = 4, Type = "select", Options = Provider.GetTable("TenHanhChinh").ToList("Ten"), }, 
                 new TE { Name = "Ten", Caption = "Tên đơn vị", Layout = 8 }, 
             }; 
@@ -82,7 +83,7 @@ namespace WinApp.Views.HanhChinh
             }
             else
             {
-                var opts = Models.DonVi.DanhSach(capId - 1);
+                var opts = DonViService.DanhSach(capId - 1);
                 truc_thuoc.SetOptions(opts);
                 truc_thuoc.IsEnabled = true;
                 truc_thuoc.Value = null;
@@ -119,7 +120,7 @@ namespace WinApp.Views.HanhChinh
         { 
             public Section(int cap, Section next) 
             { 
-                Cap = Models.DonVi.HanhChinh[cap]; 
+                Cap = DonViService.HanhChinh[cap]; 
                 OnSelected = one => { if (next != null) { next.TrucThuoc = one; } }; 
                 AddNewButton.Click += (s, e) => { App.RedirectToAction("add", new Models.ViewDonVi { HanhChinhId = Cap.Id, TrucThuocId = TrucThuoc.Id }); }; 
             } 

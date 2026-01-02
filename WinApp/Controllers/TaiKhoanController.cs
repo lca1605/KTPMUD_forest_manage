@@ -42,7 +42,7 @@ namespace WinApp.Controllers
             
             // Thêm mới tài khoản
             var acc = new TaiKhoan {
-                Ten = e.TenDangNhap,
+                TenDangNhap = e.TenDangNhap,
                 MatKhau = "1234",
                 QuyenId = e.QuyenId,
                 HoSoId = HoSoDb.GetIdentity(), // lấy Id của HoSo
@@ -61,7 +61,7 @@ namespace WinApp.Controllers
         protected override void TryDelete(ViewHoSo e)
         {
             // Xóa tài khoản
-            ExecSQL(TaiKhoanDb.CreateDeleteSql(new TaiKhoan { Ten = e.TenDangNhap }));
+            ExecSQL(TaiKhoanDb.CreateDeleteSql(new TaiKhoan { TenDangNhap = e.TenDangNhap }));
 
             // Xóa hồ sơ
             ExecSQL(HoSoDb.CreateDeleteSql(e));

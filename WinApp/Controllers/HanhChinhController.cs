@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Models;
+using Services;
 using System.Mvc;
 
 namespace WinApp.Controllers
@@ -11,7 +12,7 @@ namespace WinApp.Controllers
     partial class HanhChinhController : DataController<ViewDonVi>
     {
         protected override ViewDonVi CreateEntity()
-            => new ViewDonVi { HanhChinhId = DonVi.CapHanhChinhDangXuLy };
+            => new ViewDonVi { HanhChinhId = DonViService.CapHanhChinhDangXuLy };
 
         public object Add(ViewDonVi one)
             => View(new EditContext { Model = one, Action = EditActions.Insert });
@@ -23,7 +24,7 @@ namespace WinApp.Controllers
 
         protected object Select(int? cap)
         {
-            return DonVi.DanhSach(DonVi.CapHanhChinhDangXuLy = cap);
+            return DonViService.DanhSach(DonViService.CapHanhChinhDangXuLy = cap);
         }
 
         public object Huyen() => View(Select(2));

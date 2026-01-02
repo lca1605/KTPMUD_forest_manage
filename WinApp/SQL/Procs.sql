@@ -74,12 +74,12 @@ BEGIN
     end
 
     declare @fk int
-    set @fk = (select HoSoId from TaiKhoan where Ten = @TenDangNhap)
+    set @fk = (select HoSoId from TaiKhoan where TenDangNhap = @TenDangNhap)
     if @fk is null
     begin
         insert into HoSo values (@Ten,@SDT,@Email,@Ext)
         set @Id = @@IDENTITY
-        insert into TaiKhoan values (@TenDangNhap,@MatKhau,@QuyenId,@Id,NULL,N'Offline',NULL,NULL)
+        insert into TaiKhoan values (@TenDangNhap,@MatKhau,@QuyenId,@Id,NULL,NULL)
     end
 END
 go
@@ -94,7 +94,7 @@ create proc changePass
 ) as
 BEGIN
     update TaiKhoan set MatKhau = @MatKhau
-    where Ten = @Ten
+    where TenDangNhap = @Ten
 END
 go
 
@@ -106,18 +106,16 @@ if exists (select * from sys.objects where type = 'P' and name = 'updateTaiKhoan
 go
 create proc updateTaiKhoan
 ( @action int
-, @Ten varchar(50)
+, @TenDangNhap varchar(50)
 , @MatKhau varchar(255) = NULL
 , @QuyenId int = NULL
 , @HoSoId int = NULL
 , @MaDonViId int = NULL
-, @HoTen nvarchar(100) = NULL
-, @TrangThai nvarchar(20) = NULL
 ) as
 BEGIN
     if @action = -1
     begin
-        delete from TaiKhoan where Ten = @Ten
+        delete from TaiKhoan where TenDangNhap = @TenDangNhap
         return
     end
     if @action = 0
@@ -126,14 +124,12 @@ BEGIN
             MatKhau = @MatKhau,
             QuyenId = @QuyenId,
             HoSoId = @HoSoId,
-            MaDonViId = @MaDonViId,
-            HoTen = @HoTen,
-            TrangThai = @TrangThai
-            where Ten = @Ten
+            MaDonViId = @MaDonViId
+            where TenDangNhap = @TenDangNhap
         return
     end
     insert into TaiKhoan values (
-        @Ten,@MatKhau,@QuyenId,@HoSoId,NULL,@TrangThai,@MaDonViId,@HoTen
+        @TenDangNhap,@MatKhau,@QuyenId,@HoSoId,NULL,@MaDonViId
     )
 END
 go
@@ -147,9 +143,8 @@ create proc updateTrangThaiTaiKhoan
 ) as
 BEGIN
     update TaiKhoan set 
-        TrangThai = @TrangThai,
         LanCuoiHoatDong = GETDATE()
-    where Ten = @Ten
+    where TenDangNhap = @Ten
 END
 go
 
@@ -195,86 +190,6 @@ END
 go
 
 -- =============================================
--- Procedures cho bảng CoSoGiongCayTrong
--- =============================================
-if exists (select * from sys.objects where type = 'P' and name = 'updateCoSoGiongCayTrong')
-    drop proc updateCoSoGiongCayTrong
-go
-create proc updateCoSoGiongCayTrong
-( @action int
-, @CoSoId int
-) as
-BEGIN
-    if @action = -1
-    begin
-        delete from CoSoGiongCayTrong where CoSoId = @CoSoId
-        return
-    end
-    if @action = 0
-    begin
-        return
-    end
-    insert into CoSoGiongCayTrong values (@CoSoId)
-END
-go
-
--- =============================================
--- Procedures cho bảng CoSoCheBienGo
--- =============================================
-if exists (select * from sys.objects where type = 'P' and name = 'updateCoSoCheBienGo')
-    drop proc updateCoSoCheBienGo
-go
-create proc updateCoSoCheBienGo
-( @action int
-, @CoSoId int
-, @LoaiHinhSanXuatGoId int = NULL
-, @HinhThucHoatDongGoId int = NULL
-) as
-BEGIN
-    if @action = -1
-    begin
-        delete from CoSoCheBienGo where CoSoId = @CoSoId
-        return
-    end
-    if @action = 0
-    begin
-        update CoSoCheBienGo set
-            LoaiHinhSanXuatGoId = @LoaiHinhSanXuatGoId,
-            HinhThucHoatDongGoId = @HinhThucHoatDongGoId
-            where CoSoId = @CoSoId
-        return
-    end
-    insert into CoSoCheBienGo values (
-        @CoSoId,@LoaiHinhSanXuatGoId,@HinhThucHoatDongGoId
-    )
-END
-go
-
--- =============================================
--- Procedures cho bảng CoSoLuuGiuDongVat
--- =============================================
-if exists (select * from sys.objects where type = 'P' and name = 'updateCoSoLuuGiuDongVat')
-    drop proc updateCoSoLuuGiuDongVat
-go
-create proc updateCoSoLuuGiuDongVat
-( @action int
-, @CoSoId int
-) as
-BEGIN
-    if @action = -1
-    begin
-        delete from CoSoLuuGiuDongVat where CoSoId = @CoSoId
-        return
-    end
-    if @action = 0
-    begin
-        return
-    end
-    insert into CoSoLuuGiuDongVat values (@CoSoId)
-END
-go
-
--- =============================================
 -- Procedures cho bảng GiongCay
 -- =============================================
 if exists (select * from sys.objects where type = 'P' and name = 'updateGiongCay')
@@ -285,6 +200,7 @@ create proc updateGiongCay
 , @Id int output
 , @Ten nvarchar(50) = NULL
 , @Nguon nvarchar(255) = NULL
+, @MoTa nvarchar(200) = NULL
 ) as
 BEGIN
     if @action = -1
@@ -296,11 +212,12 @@ BEGIN
     begin
         update GiongCay set
             Ten = @Ten,
-            Nguon = @Nguon
+            Nguon = @Nguon,
+            MoTa = @MoTa
             where Id = @Id
         return
     end
-    insert into GiongCay values (@Ten,@Nguon)
+    insert into GiongCay values (@Ten,@Nguon,@MoTa)
     set @Id = @@IDENTITY
 END
 go
@@ -411,6 +328,100 @@ BEGIN
         @CoSoId,@LoaiKyBaoCaoId,@Nam,@KySo,@GiaTriKy,@DienTich,@SanLuong,@GhiChu
     )
     set @Id = @@IDENTITY
+END
+go
+
+-- =============================================
+-- Procedures cho bảng LoaiHinhSanXuatGo
+-- =============================================
+if exists (select * from sys.objects where type = 'P' and name = 'updateLoaiHinhSanXuatGo')
+    drop proc updateLoaiHinhSanXuatGo
+go
+create proc updateLoaiHinhSanXuatGo
+( @action int
+, @Id int output
+, @Ten nvarchar(100) = NULL
+, @MoTa nvarchar(200) = NULL
+) as
+BEGIN
+    if @action = -1
+    begin
+        delete from LoaiHinhSanXuatGo where Id = @Id
+        return
+    end
+    if @action = 0
+    begin
+        update LoaiHinhSanXuatGo set
+            Ten = @Ten,
+            MoTa = @MoTa
+            where Id = @Id
+        return
+    end
+    insert into LoaiHinhSanXuatGo values (@Ten,@MoTa)
+    set @Id = @@IDENTITY
+END
+go
+
+-- =============================================
+-- Procedures cho bảng HinhThucHoatDongGo
+-- =============================================
+if exists (select * from sys.objects where type = 'P' and name = 'updateHinhThucHoatDongGo')
+    drop proc updateHinhThucHoatDongGo
+go
+create proc updateHinhThucHoatDongGo
+( @action int
+, @Id int output
+, @Ten nvarchar(100) = NULL
+, @MoTa nvarchar(200) = NULL
+) as
+BEGIN
+    if @action = -1
+    begin
+        delete from HinhThucHoatDongGo where Id = @Id
+        return
+    end
+    if @action = 0
+    begin
+        update HinhThucHoatDongGo set
+            Ten = @Ten,
+            MoTa = @MoTa
+            where Id = @Id
+        return
+    end
+    insert into HinhThucHoatDongGo values (@Ten,@MoTa)
+    set @Id = @@IDENTITY
+END
+go
+
+-- =============================================
+-- Procedures cho bảng CoSoCheBienGo
+-- =============================================
+if exists (select * from sys.objects where type = 'P' and name = 'updateCoSoCheBienGo')
+    drop proc updateCoSoCheBienGo
+go
+create proc updateCoSoCheBienGo
+( @action int
+, @CoSoId int
+, @LoaiHinhSanXuatGoId int = NULL
+, @HinhThucHoatDongGoId int = NULL
+) as
+BEGIN
+    if @action = -1
+    begin
+        delete from CoSoCheBienGo where CoSoId = @CoSoId
+        return
+    end
+    if @action = 0
+    begin
+        update CoSoCheBienGo set
+            LoaiHinhSanXuatGoId = @LoaiHinhSanXuatGoId,
+            HinhThucHoatDongGoId = @HinhThucHoatDongGoId
+            where CoSoId = @CoSoId
+        return
+    end
+    insert into CoSoCheBienGo values (
+        @CoSoId,@LoaiHinhSanXuatGoId,@HinhThucHoatDongGoId
+    )
 END
 go
 

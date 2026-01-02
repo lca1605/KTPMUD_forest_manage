@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Vst.Controls;
+using Services;
 
 namespace WinApp.Views.CoSo
 {
@@ -72,7 +73,7 @@ namespace WinApp.Views.CoSo
 
                 new TE { Name = "DonViId", Caption = "Đơn vị", Layout = 6,
                     Type = "ssb", ValueName = "Id", DisplayName = "TenDayDu",
-                    Options = Models.DonVi.GetAll() },
+                    Options = DonViService.GetAll() },
 
                 new TE { Name = "DiaChi", Caption = "Địa chỉ", Layout = 12 },
                 new TE { Name = "NguoiDaiDien", Caption = "Người đại diện", Layout = 6 },

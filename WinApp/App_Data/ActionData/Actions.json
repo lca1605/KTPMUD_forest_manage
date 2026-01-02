@@ -96,7 +96,7 @@
           {
             "Text": "Hành chính",
             "Refs": [ "hanhchinh", "hanhchinh/huyen", "hanhchinh/xa" ]
-          },,
+          },
           {
             "Text": "Profile",
             "Refs": [ "me/changepass" ]

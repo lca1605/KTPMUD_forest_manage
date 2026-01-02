@@ -13,12 +13,12 @@ namespace WinApp.Controllers
     {
         public override object Index()
         {
-            return View(new EditContext(new TaiKhoan { Ten = "dev", MatKhau = "1234" }));
+            return View(new EditContext(new TaiKhoan { TenDangNhap = "dev", MatKhau = "1234" }));
         }
         protected override void UpdateCore(TaiKhoan acc)
         {
             var pass = acc.MatKhau;
-            acc = DataEngine.Find<TaiKhoan>(acc.Ten);
+            acc = DataEngine.Find<TaiKhoan>(acc.TenDangNhap);
 
             if (acc == null)
             {
@@ -31,7 +31,7 @@ namespace WinApp.Controllers
                 return;
             }
 
-            var userName = acc.Ten.Replace("'", "''");
+            var userName = acc.TenDangNhap.Replace("'", "''");
             ExecSQL(
                 $"UPDATE TaiKhoan SET LanCuoiHoatDong = GETDATE() WHERE Ten = '{userName}'"
             );
@@ -39,7 +39,7 @@ namespace WinApp.Controllers
             var role = Provider.GetTable<Quyen>().GetValueById("Ext", acc.QuyenId);
             var u = (User)Activator.CreateInstance(Type.GetType($"Actors.{role}"));
 
-            u.UserName = acc.Ten;
+            u.UserName = acc.TenDangNhap;
             if (acc.HoSoId != 0)
             {
                 var p = Provider.GetTable<HoSo>().Find<HoSo>(acc.HoSoId);
