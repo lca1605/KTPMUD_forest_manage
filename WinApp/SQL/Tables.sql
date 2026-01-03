@@ -2,69 +2,7 @@
 GO
 
 /* =========================
-   1) User
-   ========================= */
-CREATE TABLE HoSo
-( Id INT PRIMARY KEY IDENTITY
-, Ten NVARCHAR(50)
-, SDT VARCHAR(50)
-, Email VARCHAR(50)
-, Ext TEXT
-)
-GO
-
-INSERT INTO HoSo VALUES
-    (N'Vũ Song Tùng', '0989154248', 'tung.vusong@hust.edu.vn', NULL),
-    (N'Đào Lê Thu Thảo', '0989708960', 'thao.daolethu@hust.edu.vn', NULL)
-GO
-
-CREATE TABLE Quyen
-( Id INT PRIMARY KEY IDENTITY
-, Ten NVARCHAR(50)
-, Ext VARCHAR(50)
-)
-GO
-
-INSERT INTO Quyen VALUES
-    (N'Lập trình viên', 'Developer'),
-    (N'Quản trị hệ thống', 'Admin'),
-    (N'Cán bộ nghiệp vụ', 'Staff')
-GO
-
-CREATE TABLE TaiKhoan
-( TenDangNhap VARCHAR(50) PRIMARY KEY
-, MatKhau VARCHAR(255) NOT NULL
-, QuyenId INT NOT NULL FOREIGN KEY REFERENCES Quyen(Id)
-, HoSoId INT NULL FOREIGN KEY REFERENCES HoSo(Id)
-, LanCuoiHoatDong DATETIME NULL
-, MaDonViId INT NULL FOREIGN KEY REFERENCES DonVi(Id)
-)
-GO
-
-INSERT INTO TaiKhoan VALUES
-    ('dev', '1234', 1, NULL, NULL, NULL),
-    ('admin', '1234', 2, NULL, NULL, NULL),
-    ('0989154248', '1234', 3, 1, NULL, NULL),
-    ('0989708960', '1234', 3, 2, NULL, NULL),
-    ('cb_hanoi', '123', 3, NULL, NULL, 1),
-    ('cb_thaibinh', '123', 3, NULL, NULL, 5),
-    ('cb_hbt_01', '123', 3, NULL, NULL, 2),
-    ('cb_thaithuy', '123', 3, NULL, NULL, 6),
-    ('cb_bk_01', '123', 3, NULL, NULL, 3),
-    ('cb_bk_02', '123', 3, NULL, NULL, 3),
-    ('cb_thuyhai', '123', 3, NULL, NULL, 7)
-GO
-
-CREATE VIEW ViewHoSo AS
-    SELECT HoSo.*, TaiKhoan.TenDangNhap AS TenDangNhap, MatKhau, QuyenId, 
-           Quyen.Ten AS Quyen, TaiKhoan.LanCuoiHoatDong 
-    FROM TaiKhoan
-    INNER JOIN Quyen ON QuyenId = Quyen.Id
-    INNER JOIN HoSo ON HoSoId = HoSo.Id
-GO
-
-/* =========================
-   2) HanhChinh (4 cấp)
+   1) HanhChinh (4 cấp)
    ========================= */
 CREATE TABLE HanhChinh
 ( Id INT PRIMARY KEY IDENTITY
@@ -125,6 +63,68 @@ CREATE VIEW ViewDonVi AS
         (SELECT DonVi.*, HanhChinh.Ten AS Cap FROM DonVi 
         INNER JOIN HanhChinh ON HanhChinhId = HanhChinh.Id) AS T
     LEFT JOIN DonVi ON T.TrucThuocId = DonVi.Id
+GO
+
+/* =========================
+   2) User
+   ========================= */
+CREATE TABLE HoSo
+( Id INT PRIMARY KEY IDENTITY
+, Ten NVARCHAR(50)
+, SDT VARCHAR(50)
+, Email VARCHAR(50)
+, Ext TEXT
+)
+GO
+
+INSERT INTO HoSo VALUES
+    (N'Vũ Song Tùng', '0989154248', 'tung.vusong@hust.edu.vn', NULL),
+    (N'Đào Lê Thu Thảo', '0989708960', 'thao.daolethu@hust.edu.vn', NULL)
+GO
+
+CREATE TABLE Quyen
+( Id INT PRIMARY KEY IDENTITY
+, Ten NVARCHAR(50)
+, Ext VARCHAR(50)
+)
+GO
+
+INSERT INTO Quyen VALUES
+    (N'Lập trình viên', 'Developer'),
+    (N'Quản trị hệ thống', 'Admin'),
+    (N'Cán bộ nghiệp vụ', 'Staff')
+GO
+
+CREATE TABLE TaiKhoan
+( TenDangNhap VARCHAR(50) PRIMARY KEY
+, MatKhau VARCHAR(255) NOT NULL
+, QuyenId INT NOT NULL FOREIGN KEY REFERENCES Quyen(Id)
+, HoSoId INT NULL FOREIGN KEY REFERENCES HoSo(Id)
+, LanCuoiHoatDong DATETIME NULL
+, MaDonViId INT NULL FOREIGN KEY REFERENCES DonVi(Id)
+)
+GO
+
+INSERT INTO TaiKhoan VALUES
+    ('dev', '1234', 1, NULL, NULL, NULL),
+    ('admin', '1234', 2, NULL, NULL, NULL),
+    ('0989154248', '1234', 3, 1, NULL, NULL),
+    ('0989708960', '1234', 3, 2, NULL, NULL),
+    ('cb_hanoi', '123', 3, NULL, NULL, 1),
+    ('cb_thaibinh', '123', 3, NULL, NULL, 5),
+    ('cb_hbt_01', '123', 3, NULL, NULL, 2),
+    ('cb_thaithuy', '123', 3, NULL, NULL, 6),
+    ('cb_bk_01', '123', 3, NULL, NULL, 3),
+    ('cb_bk_02', '123', 3, NULL, NULL, 3),
+    ('cb_thuyhai', '123', 3, NULL, NULL, 7)
+GO
+
+CREATE VIEW ViewHoSo AS
+    SELECT HoSo.*, TaiKhoan.TenDangNhap AS TenDangNhap, MatKhau, QuyenId, 
+           Quyen.Ten AS Quyen, TaiKhoan.LanCuoiHoatDong 
+    FROM TaiKhoan
+    INNER JOIN Quyen ON QuyenId = Quyen.Id
+    INNER JOIN HoSo ON HoSoId = HoSo.Id
 GO
 
 /* =========================

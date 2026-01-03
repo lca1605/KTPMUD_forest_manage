@@ -30,10 +30,4 @@ namespace Models
         public int? GroupId { get; set; }
         public int? TacDongId { get; set; }
     }
-
-    public partial class LoaiKyBaoCao
-    {
-        public int? Id { get; set; }
-        public string Ten { get; set; }
-    }
 }

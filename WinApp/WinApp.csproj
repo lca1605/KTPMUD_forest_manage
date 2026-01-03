@@ -80,11 +80,14 @@
     <Compile Include="Models\CoSoQuanLy\DongVat.cs" />
     <Compile Include="Models\CoSoQuanLy\GiongCay.cs" />
     <Compile Include="Models\CoSoQuanLy\Go.cs" />
+    <Compile Include="Models\CoSoQuanLy\ThongKe.cs" />
     <Compile Include="Models\User\NhomNguoiDung.cs" />
     <Compile Include="Models\HanhChinhQuanLy\DonViHanhChinh.cs" />
     <Compile Include="Models\UpdateContext.cs" />
     <Compile Include="Models\User\TaiKhoan.cs" />
-    <Compile Include="Services\CoSoService.cs" />
+    <Compile Include="Services\CoSoServices\BaoCaoProvider.cs" />
+    <Compile Include="Services\CoSoServices\CoSoService.cs" />
+    <Compile Include="Services\CoSoServices\GiongCayService.cs" />
     <Compile Include="Services\DonViService.cs" />
     <Compile Include="Views\Admin\Test.cs" />
     <Compile Include="Views\BaseView.cs" />
