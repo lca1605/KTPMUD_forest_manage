@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Vst.Controls;
 using SWC = System.Windows.Controls;
+using Models;
 
 namespace WinApp.Views
 {
@@ -25,6 +26,10 @@ namespace WinApp.Views
         public object Layout { get; set; }
         public object Result { get; set; }
         public Func<object, string, bool> Search { get; set; }
+        public Dictionary<string, string> FacilityData { get; set; }
+        public List<TableConfig> TableConfigs { get; set; }
+        public int? CoSoId { get; set; }
+
     }
 
     public class FileDialogView<TDialog> : System.Mvc.IView

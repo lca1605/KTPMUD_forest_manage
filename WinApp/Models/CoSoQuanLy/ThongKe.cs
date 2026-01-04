@@ -4,36 +4,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using WinApp.Views;
 
 namespace Models
 {
-    public class ThongKeChart
-    {
-        public string Label { get; set; }
-        public decimal Value { get; set; }
-    }
-
     public partial class LoaiKyBaoCao
     {
         public int? Id { get; set; }
         public string Ten { get; set; }
     }
 
-    public class ChiTieuThongKe
+    public class PeriodInfo
     {
-        public string Key { get; set; }
-        public string Ten { get; set; }
-        public string DonVi { get; set; }
+        public int LoaiKyBaoCaoId { get; set; }
+        public int? KySo { get; set; }
+        public int? Nam { get; set; }
     }
 
-    public class BaoCaoThongKeContext : ViewContext
+    public class TableConfig
     {
-        public int CoSoId { get; set; }
-        public int LoaiCoSoId { get; set; }
-        public int Nam { get; set; }
-        public int LoaiKyBaoCaoId { get; set; }
-        public string ChiTieuKey { get; set; }
-        public BaoCaoProvider Provider { get; set; }
+        public string Title { get; set; }
+        public System.Collections.IEnumerable Columns { get; set; }
+        public System.Collections.IEnumerable Items { get; set; }
+        public Func<object, int, int?, int?, bool> PeriodFilter { get; set; }
+        public Func<object, string, bool> Search { get; set; }
+        public List<PeriodInfo> AvailablePeriods { get; set; }
+
+        public bool HasPeriodFilter => PeriodFilter != null;
+        public bool HasSearch => Search != null;
+    }
+
+    public class TableFilterContext
+    {
+        public Vst.Controls.TableView TableView { get; set; }
+        public List<object> AllItems { get; set; }
+        public List<object> OriginalItems { get; set; }  // THAY ĐỔI: Từ IEnumerable thành List<object>
+        public Func<object, int, int?, int?, bool> PeriodFilterFunc { get; set; }
+        public Func<object, string, bool> SearchFunc { get; set; }
+        public ComboBox PeriodTypeCombo { get; set; }
+        public ComboBox PeriodCombo { get; set; }
+        public Vst.Controls.SearchBox SearchBox { get; set; }
+        public List<PeriodInfo> AvailablePeriods { get; set; }
+        public System.Windows.Controls.TextBlock PeriodLabel { get; set; }
     }
 }

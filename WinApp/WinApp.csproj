@@ -85,9 +85,9 @@
     <Compile Include="Models\HanhChinhQuanLy\DonViHanhChinh.cs" />
     <Compile Include="Models\UpdateContext.cs" />
     <Compile Include="Models\User\TaiKhoan.cs" />
-    <Compile Include="Services\CoSoServices\BaoCaoProvider.cs" />
     <Compile Include="Services\CoSoServices\CoSoService.cs" />
-    <Compile Include="Services\CoSoServices\GiongCayService.cs" />
+    <Compile Include="Services\CoSoServices\GiongService.cs" />
+    <Compile Include="Services\CoSoServices\GoService.cs" />
     <Compile Include="Services\DonViService.cs" />
     <Compile Include="Views\Admin\Test.cs" />
     <Compile Include="Views\BaseView.cs" />
@@ -109,8 +109,8 @@
       <DependentUpon>MigrateLayout.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TaiKhoan\TaiKhoanManagerView.cs" />
-    <Compile Include="Views\_layouts\BaoCaoViewLayout.xaml.cs">
-      <DependentUpon>BaoCaoViewLayout.xaml</DependentUpon>
+    <Compile Include="Views\_layouts\FacilityReportLayout.xaml.cs">
+      <DependentUpon>FacilityReportLayout.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\_layouts\PageHeader.xaml.cs">
       <DependentUpon>PageHeader.xaml</DependentUpon>
@@ -175,7 +175,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\_layouts\BaoCaoViewLayout.xaml">
+    <Page Include="Views\_layouts\FacilityReportLayout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -229,7 +229,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\BaoCaoCoSo\" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="App_Data\301124_version moi.txt" />
     <Content Include="SQL\Procs.sql" />

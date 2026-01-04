@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,8 @@ namespace WinApp.Views
     /// </summary>
     public partial class DataListViewLayout : UserControl, ILayout
     {
+        public string OpenAction { get; set; } = "edit"; // Thêm property này
+
         public void Render(ViewContext context)
         {
             var grid = (Vst.Controls.TableView)Body.Child;
@@ -38,7 +41,7 @@ namespace WinApp.Views
                 Header.SearchBox.Cleared += () => grid.ItemsSource = items;
                 Header.SearchBox.Searching += (s) => {
                     var lst = new List<object>();
-                    
+
                     s = s.ToLower();
                     foreach (var i in items)
                     {
@@ -51,6 +54,7 @@ namespace WinApp.Views
                 };
             }
         }
+
         public DataListViewLayout()
         {
             InitializeComponent();
@@ -58,8 +62,18 @@ namespace WinApp.Views
             var grid = new Vst.Controls.TableView();
             Body.Child = grid;
 
+            // Trong DataListViewLayout.xaml.cs
             grid.OpenItem += e => {
-                App.RedirectToAction("edit", e);
+                // Nếu e là ViewCoSo, lấy Id
+                if (e is ViewCoSo)
+                {
+                    var coSo = (ViewCoSo)e;
+                    App.RedirectToAction(OpenAction, coSo.Id ?? 0);
+                }
+                else
+                {
+                    App.RedirectToAction(OpenAction, e);
+                }
             };
 
             Header.CreateAction(new ActionContext("Thêm mới", () => App.RedirectToAction("add")));

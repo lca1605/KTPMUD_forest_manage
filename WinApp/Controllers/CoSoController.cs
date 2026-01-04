@@ -53,6 +53,18 @@ namespace WinApp.Controllers
             return base.Error(code, message);
         }
 
+        public object BaoCaoGiong(int id)
+        {
+            CheckUserActivity();
+            return View(id);
+        }
+
+        public object BaoCaoGo(int id)
+        {
+            CheckUserActivity();
+            return View(id);
+        }
+
         #region Không dùng Procedure - Insert/Update/Delete trực tiếp
         DataSchema.Table CoSoDb => Provider.GetTable<CoSo>();
 

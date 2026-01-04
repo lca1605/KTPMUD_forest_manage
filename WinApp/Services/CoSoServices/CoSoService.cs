@@ -36,5 +36,24 @@ namespace Services
                 return _loaiCoSo;
             }
         }
+
+        static ViewCoSo[] _tatCaCoSo;
+
+        // Cache lại toàn bộ cơ sở để truy xuất tức thì theo ID
+        static public ViewCoSo[] TatCaCoSo
+        {
+            get
+            {
+                if (_tatCaCoSo == null)
+                    _tatCaCoSo = Provider.Select<ViewCoSo>().ToArray();
+                return _tatCaCoSo;
+            }
+        }
+
+        // Tìm cơ sở theo ID từ bộ nhớ cache
+        static public ViewCoSo LayChiTiet(int id)
+        {
+            return TatCaCoSo.FirstOrDefault(x => x.Id == id);
+        }
     }
 }

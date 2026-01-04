@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Models;
 
 namespace WinApp.Controllers
 {
-    using Models;
     class UpdateContext : EditContext
     {
         public string Message { get; set; }

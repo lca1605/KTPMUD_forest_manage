@@ -72,6 +72,11 @@ namespace Vst.Controls
     {
         public TableHeaderCell()
         {
+            if (Background == null)
+            {
+                Background = new SolidColorBrush(Color.FromRgb(0xF5, 0xF5, 0xF5));
+            }
+            FontWeight = FontWeights.SemiBold;
         }
     }
     public class TableHeader : TableRow
