@@ -21,7 +21,7 @@ namespace WinApp.Views
     /// </summary>
     public partial class DataListViewLayout : UserControl, ILayout
     {
-        public string OpenAction { get; set; } = "edit"; // Thêm property này
+        public string OpenAction { get; set; } = "edit";
 
         public void Render(ViewContext context)
         {
@@ -62,10 +62,8 @@ namespace WinApp.Views
             var grid = new Vst.Controls.TableView();
             Body.Child = grid;
 
-            // Trong DataListViewLayout.xaml.cs
             grid.OpenItem += e => {
-                // Nếu e là ViewCoSo, lấy Id
-                if (e is ViewCoSo)
+                if (e is ViewCoSo && OpenAction != "edit")
                 {
                     var coSo = (ViewCoSo)e;
                     App.RedirectToAction(OpenAction, coSo.Id ?? 0);

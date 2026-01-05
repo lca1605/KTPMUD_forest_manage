@@ -23,7 +23,7 @@ namespace WinApp.Views.CoSo
             context.Title = "Danh sách cơ sở";
             context.TableColumns = new object[] {
                 new TC { Name = "Ten", Caption = "Tên cơ sở", Width = 200 },
-                new TC { Name = "TenLoaiCoSo", Caption = "Loại cơ sở", Width = 120 },
+                new TC { Name = "TenLoaiCoSo", Caption = "Loại cơ sở", Width = 200 },
                 new TC { Name = "TenDonVi", Caption = "Đơn vị", Width = 150 },
                 new TC { Name = "DiaChi", Caption = "Địa chỉ", Width = 200 },
                 new TC { Name = "NguoiDaiDien", Caption = "Người đại diện", Width = 130 },
@@ -38,17 +38,16 @@ namespace WinApp.Views.CoSo
         }
     }
 
-    // View chính - GIỮ ĐƠN GIẢN, chỉ hiển thị
     class Index : CoSoView
     {
         protected override void RenderCore(ViewContext context)
         {
             base.RenderCore(context);
             context.Title = "Quản lý cơ sở - Tất cả";
+            context.Model = CoSoService.DanhSach(null);
         }
     }
 
-    // Edit & Add views
     class Edit : Add
     {
         protected override void OnReady()

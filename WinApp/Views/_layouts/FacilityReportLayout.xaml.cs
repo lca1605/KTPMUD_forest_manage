@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Models;
+using Vst.Controls;
 
 namespace WinApp.Views
 {
@@ -19,7 +20,19 @@ namespace WinApp.Views
 
         public void Render(ViewContext context)
         {
+            Console.WriteLine($"[DEBUG] Rendering FacilityReport. CoSoId in Context: {context.CoSoId}");
+
+            if (context.FacilityData == null)
+                Console.WriteLine("[DEBUG] WARNING: FacilityData is NULL");
+            else
+                Console.WriteLine($"[DEBUG] FacilityData count: {context.FacilityData.Count}");
+
+            if (context.TableConfigs == null)
+                Console.WriteLine("[DEBUG] WARNING: TableConfigs is NULL");
+            context.BackUrl = App.LastUrl;
             Header.DataContext = context;
+            Header.SearchBox.Visibility = Visibility.Collapsed;
+
 
             // Lưu CoSoId
             if (context.CoSoId.HasValue)
@@ -83,22 +96,15 @@ namespace WinApp.Views
             tableContexts.Clear();
 
             var tableConfigs = context.TableConfigs;
-            if (tableConfigs == null || tableConfigs.Count == 0)
-                return;
+            if (tableConfigs == null || tableConfigs.Count == 0) return;
 
             foreach (var config in tableConfigs)
             {
-                // Container cho mỗi bảng
-                var tableSection = new StackPanel
-                {
-                    Margin = new Thickness(0, 0, 0, 20)
-                };
+                // 1. Container cho mỗi bảng
+                var tableSection = new StackPanel { Margin = new Thickness(0, 0, 0, 25) };
 
-                // Header của bảng (tiêu đề + filter/search)
-                var headerPanel = new Grid
-                {
-                    Margin = new Thickness(0, 0, 0, 10)
-                };
+                // 2. Header Grid: Chia làm 2 cột (Tiêu đề bên trái, Filter/Nút bên phải)
+                var headerPanel = new Grid { Margin = new Thickness(0, 0, 0, 10) };
                 headerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 headerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
@@ -106,148 +112,119 @@ namespace WinApp.Views
                 var title = new TextBlock
                 {
                     Text = config.Title,
-                    FontSize = 14,
+                    FontSize = 15,
                     FontWeight = FontWeights.Bold,
                     VerticalAlignment = VerticalAlignment.Center,
                     Foreground = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33))
                 };
-                Grid.SetColumn(title, 0);
                 headerPanel.Children.Add(title);
 
-                // Tạo bảng
-                var grid = new Vst.Controls.TableView();
+                // Group điều khiển bên phải (Nút thêm + Search/Filter)
+                var controlPanel = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+                Grid.SetColumn(controlPanel, 1);
+                headerPanel.Children.Add(controlPanel);
 
-                var allItems = new List<object>();
-                if (config.Items != null)
+                // 3. Nút Thêm mới (nếu có)
+                if (!string.IsNullOrEmpty(config.ControllerName) && !string.IsNullOrEmpty(config.AddAction))
                 {
-                    foreach (var item in config.Items)
+                    var btnAdd = new Vst.Controls.Button
                     {
-                        if (item != null)
-                        {
-                            allItems.Add(item);
-                        }
-                    }
-                }
-
-                // Set chiều cao ban đầu dựa trên số items
-                int initialRowCount = allItems.Count;
-                int initialVisibleRows = Math.Min(initialRowCount, 15); // Tối đa 15 dòng
-                double initialHeight = 30 + (initialVisibleRows * 30) + 20; // header + rows + scrollbar
-                grid.Height = initialHeight;
-
-                // Thêm các cột từ config
-                if (config.Columns != null)
-                {
-                    foreach (Vst.Controls.TableColumn col in config.Columns)
-                    {
-                        grid.Columns.Add(col);
-                    }
-                }
-
-
-                // Kiểm tra nếu không có dữ liệu
-                if (allItems.Count == 0)
-                {
-                    var noDataPanel = new Border
-                    {
-                        Height = 80,
-                        Background = Brushes.White,
-                        BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
-                        BorderThickness = new Thickness(1),
-                        Child = new TextBlock
-                        {
-                            Text = "Không có dữ liệu",
-                            FontSize = 14,
-                            Foreground = new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0x99)),
-                            FontStyle = FontStyles.Italic,
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            VerticalAlignment = VerticalAlignment.Center
-                        }
+                        Width = 75,
+                        Height = 26,
+                        BorderRadius = 13,
+                        FontSize = 11,
+                        Margin = new Thickness(10, 0, 0, 0) // Cách ra khỏi filter
                     };
-
-                    tableSection.Children.Add(headerPanel);
-                    tableSection.Children.Add(noDataPanel);
-                    TablesContainer.Children.Add(tableSection);
-                    continue;
+                    btnAdd.SetAction(new ActionContext("+ Thêm", () => {
+                        object args = currentCoSoId > 0 ? new { coSoId = currentCoSoId } : null;
+                        AppContexts.CurrentCoSoId = currentCoSoId;
+                        App.RedirectToAction(config.AddAction, currentCoSoId);
+                    }));
+                    controlPanel.Children.Add(btnAdd);
                 }
 
-                grid.ItemsSource = allItems;
+                // 4. Khởi tạo Bảng dữ liệu
+                var grid = new Vst.Controls.TableView();
+                var allItems = config.Items?.Cast<object>().ToList() ?? new List<object>();
 
-                // Xử lý sự kiện mở item
-                grid.OpenItem += e => {
-                    App.RedirectToAction("edit", e);
+                // Tính toán chiều cao linh hoạt (Max 15 dòng)
+                int initialVisibleRows = Math.Min(allItems.Count, 15);
+                if (initialVisibleRows == 0) initialVisibleRows = 2; // Chiều cao tối thiểu nếu trống
+                grid.Height = 35 + (initialVisibleRows * 30) + 15;
+
+                // Sự kiện Double Click để sửa
+                grid.OpenItem += (item) => {
+                    if (item != null && !string.IsNullOrEmpty(config.ControllerName) && !string.IsNullOrEmpty(config.EditAction))
+                    {
+                        var idValue = item.GetType().GetProperty("Id")?.GetValue(item);
+                        if (idValue != null) App.Request(config.ControllerName + "/" + config.AddAction, currentCoSoId);
+                    }
                 };
 
-                // Kiểm tra loại filter
-                ComboBox periodTypeCombo = null;
-                ComboBox periodCombo = null;
-                Vst.Controls.SearchBox searchBox = null;
-                TextBlock periodLabel = null;
+                // Thêm cột
+                if (config.Columns != null)
+                {
+                    foreach (Vst.Controls.TableColumn col in config.Columns) grid.Columns.Add(col);
+                }
+
+                // 5. Xử lý Filter & Search (Gán vào controlPanel bên phải)
+                ComboBox periodTypeCombo = null; ComboBox periodCombo = null;
+                Vst.Controls.SearchBox searchBox = null; TextBlock periodLabel = null;
 
                 if (config.HasPeriodFilter)
                 {
-                    // Filter theo thời gian (tháng/quý/năm)
-                    var filterPanel = new StackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-
-                    // Combo chọn loại kỳ (Tháng/Quý/Năm)
-                    var periodTypeLabel = new TextBlock
-                    {
-                        Text = "Loại: ",
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(0, 0, 10, 0)
-                    };
-
-                    periodTypeCombo = new ComboBox
-                    {
-                        Width = 100,
-                        Margin = new Thickness(0, 0, 15, 0)
-                    };
+                    var filterStack = new StackPanel { Orientation = Orientation.Horizontal };
+                    periodTypeCombo = new ComboBox { Width = 90, Margin = new Thickness(5, 0, 5, 0) };
                     periodTypeCombo.Items.Add(new ComboBoxItem { Content = "Tháng", Tag = 1 });
                     periodTypeCombo.Items.Add(new ComboBoxItem { Content = "Quý", Tag = 2 });
                     periodTypeCombo.Items.Add(new ComboBoxItem { Content = "Năm", Tag = 3 });
                     periodTypeCombo.SelectedIndex = 0;
 
-                    // Label và Combo chọn kỳ cụ thể (sẽ ẩn/hiện theo loại)
-                    periodLabel = new TextBlock
-                    {
-                        Text = "Chọn: ",
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(0, 0, 10, 0)
-                    };
+                    periodLabel = new TextBlock { Text = " Kỳ: ", VerticalAlignment = VerticalAlignment.Center };
+                    periodCombo = new ComboBox { Width = 150 };
 
-                    periodCombo = new ComboBox
-                    {
-                        Width = 200
-                    };
-
-                    filterPanel.Children.Add(periodTypeLabel);
-                    filterPanel.Children.Add(periodTypeCombo);
-                    filterPanel.Children.Add(periodLabel);
-                    filterPanel.Children.Add(periodCombo);
-
-                    Grid.SetColumn(filterPanel, 1);
-                    headerPanel.Children.Add(filterPanel);
+                    filterStack.Children.Add(new TextBlock { Text = "Loại: ", VerticalAlignment = VerticalAlignment.Center });
+                    filterStack.Children.Add(periodTypeCombo);
+                    filterStack.Children.Add(periodLabel);
+                    filterStack.Children.Add(periodCombo);
+                    controlPanel.Children.Insert(0, filterStack); // Ưu tiên Filter nằm trước nút Thêm
                 }
                 else if (config.HasSearch)
                 {
-                    // Tìm kiếm
-                    searchBox = new Vst.Controls.SearchBox
-                    {
-                        Width = 200,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    Grid.SetColumn(searchBox, 1);
-                    headerPanel.Children.Add(searchBox);
+                    searchBox = new Vst.Controls.SearchBox { Width = 180 };
+                    controlPanel.Children.Insert(0, searchBox);
                 }
 
+                // 6. Assemble các thành phần vào Layout
                 tableSection.Children.Add(headerPanel);
-                tableSection.Children.Add(grid);
 
-                // Lưu context để xử lý filter/search
+                if (allItems.Count == 0)
+                {
+                    tableSection.Children.Add(new Border
+                    {
+                        Height = 80,
+                        Background = Brushes.White,
+                        CornerRadius = new CornerRadius(4),
+                        BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
+                        BorderThickness = new Thickness(1),
+                        Child = new TextBlock
+                        {
+                            Text = "Không có dữ liệu",
+                            FontSize = 13,
+                            FontStyle = FontStyles.Italic,
+                            Foreground = Brushes.Gray,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        }
+                    });
+                }
+                else
+                {
+                    grid.ItemsSource = allItems;
+                    tableSection.Children.Add(grid);
+                }
+
+                // Lưu context cho filter logic
                 var tableContext = new TableFilterContext
                 {
                     TableView = grid,
@@ -263,59 +240,21 @@ namespace WinApp.Views
                 };
                 tableContexts.Add(tableContext);
 
-                // Xử lý sự kiện thay đổi loại kỳ
-                if (periodTypeCombo != null && periodCombo != null && periodLabel != null)
+                // Gán logic Filter/Search (Giống code của bạn)
+                if (periodTypeCombo != null)
                 {
-                    periodTypeCombo.SelectionChanged += (s, e) =>
-                    {
-                        if (periodTypeCombo.SelectedItem is ComboBoxItem selectedType)
-                        {
-                            int loaiKy = (int)selectedType.Tag;
-
-                            // Nếu chọn Năm (loaiKy = 3), ẩn label và combo "Chọn"
-                            if (loaiKy == 3)
-                            {
-                                periodLabel.Visibility = Visibility.Collapsed;
-                                periodCombo.Visibility = Visibility.Collapsed;
-
-                                // Load danh sách năm và hiển thị data
-                                LoadYearData(tableContext);
-                            }
-                            else
-                            {
-                                // Hiện lại label và combo "Chọn" cho Tháng/Quý
-                                periodLabel.Visibility = Visibility.Visible;
-                                periodCombo.Visibility = Visibility.Visible;
-
-                                // Load dữ liệu theo loại
-                                LoadPeriodCombo(tableContext, loaiKy);
-                            }
-                        }
+                    periodTypeCombo.SelectionChanged += (s, e) => {
+                        int loaiKy = (int)((ComboBoxItem)periodTypeCombo.SelectedItem).Tag;
+                        if (loaiKy == 3) { periodLabel.Visibility = periodCombo.Visibility = Visibility.Collapsed; LoadYearData(tableContext); }
+                        else { periodLabel.Visibility = periodCombo.Visibility = Visibility.Visible; LoadPeriodCombo(tableContext, loaiKy); }
                     };
-
-                    // Load dữ liệu ban đầu (Tháng)
                     LoadPeriodCombo(tableContext, 1);
-
-                    // Xử lý sự kiện chọn kỳ
-                    periodCombo.SelectionChanged += (s, e) =>
-                    {
-                        ApplyPeriodFilter(tableContext);
-                    };
+                    periodCombo.SelectionChanged += (s, e) => ApplyPeriodFilter(tableContext);
                 }
-
-                // Xử lý sự kiện tìm kiếm
                 if (searchBox != null)
                 {
-                    searchBox.Cleared += () =>
-                    {
-                        grid.ItemsSource = tableContext.OriginalItems;
-                        UpdateTotalCount();
-                    };
-
-                    searchBox.Searching += (searchText) =>
-                    {
-                        ApplySearch(tableContext, searchText);
-                    };
+                    searchBox.Cleared += () => { grid.ItemsSource = allItems; UpdateTotalCount(); };
+                    searchBox.Searching += (txt) => ApplySearch(tableContext, txt);
                 }
 
                 TablesContainer.Children.Add(tableSection);
@@ -544,7 +483,6 @@ namespace WinApp.Views
         public FacilityReportLayout()
         {
             InitializeComponent();
-            Header.CreateAction(new ActionContext("Xuất báo cáo", () => App.RedirectToAction("export")));
         }
     }
 }

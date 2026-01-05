@@ -18,6 +18,30 @@ create proc updateDonVi
 BEGIN
     if @action = -1
     begin
+        -- Xóa tất cả các bản ghi liên quan
+        -- 1. Xóa các cơ sở thuộc đơn vị này
+        delete from ThongKeCoSoGiong where CoSoId in (select Id from CoSo where DonViId = @Id)
+        delete from CoSoGiongLoaiGiong where CoSoId in (select Id from CoSo where DonViId = @Id)
+        delete from ThongKeCoSoGo where CoSoId in (select Id from CoSo where DonViId = @Id)
+        delete from CoSoCheBienGo where CoSoId in (select Id from CoSo where DonViId = @Id)
+        delete from ThongKeSoLuongDongVat where CoSoDongVatLoaiDongVatId in 
+            (select Id from CoSoDongVatLoaiDongVat where CoSoId in (select Id from CoSo where DonViId = @Id))
+        delete from CoSoDongVatLoaiDongVat where CoSoId in (select Id from CoSo where DonViId = @Id)
+        delete from CoSo where DonViId = @Id
+        
+        -- 2. Xóa tài khoản thuộc đơn vị
+        delete from NguoiDungTrongNhom where UserName in (select TenDangNhap from TaiKhoan where MaDonViId = @Id)
+        delete from TaiKhoan where MaDonViId = @Id
+        
+        -- 3. Xóa nhóm người dùng thuộc đơn vị
+        delete from QuyenNhom where GroupId in (select Id from NhomNguoiDung where MaDonViId = @Id)
+        delete from NguoiDungTrongNhom where GroupId in (select Id from NhomNguoiDung where MaDonViId = @Id)
+        delete from NhomNguoiDung where MaDonViId = @Id
+        
+        -- 4. Xóa các đơn vị con trực thuộc (đệ quy)
+        delete from DonVi where TrucThuocId = @Id
+        
+        -- 5. Cuối cùng xóa đơn vị
         delete from DonVi where Id = @Id
         return
     end
@@ -58,7 +82,11 @@ create proc updateHoSo
 BEGIN
     if @action = -1
     begin
+        -- Xóa người dùng trong nhóm trước
+        delete from NguoiDungTrongNhom where UserName in (select TenDangNhap from TaiKhoan where HoSoId = @Id)
+        -- Xóa tài khoản
         delete from TaiKhoan where HoSoId = @Id
+        -- Cuối cùng xóa hồ sơ
         delete from HoSo where Id = @Id
         return
     end
@@ -115,6 +143,9 @@ create proc updateTaiKhoan
 BEGIN
     if @action = -1
     begin
+        -- Xóa người dùng trong nhóm trước
+        delete from NguoiDungTrongNhom where UserName = @TenDangNhap
+        -- Sau đó xóa tài khoản
         delete from TaiKhoan where TenDangNhap = @TenDangNhap
         return
     end
@@ -167,6 +198,15 @@ create proc updateCoSo
 BEGIN
     if @action = -1
     begin
+        -- Xóa các bảng thống kê và quan hệ trước
+        delete from ThongKeCoSoGiong where CoSoId = @Id
+        delete from CoSoGiongLoaiGiong where CoSoId = @Id
+        delete from ThongKeCoSoGo where CoSoId = @Id
+        delete from CoSoCheBienGo where CoSoId = @Id
+        delete from ThongKeSoLuongDongVat where CoSoDongVatLoaiDongVatId in 
+            (select Id from CoSoDongVatLoaiDongVat where CoSoId = @Id)
+        delete from CoSoDongVatLoaiDongVat where CoSoId = @Id
+        -- Cuối cùng xóa cơ sở
         delete from CoSo where Id = @Id
         return
     end
@@ -205,6 +245,9 @@ create proc updateGiongCay
 BEGIN
     if @action = -1
     begin
+        -- Xóa quan hệ với cơ sở trước
+        delete from CoSoGiongLoaiGiong where LoaiGiongId = @Id
+        -- Sau đó xóa giống cây
         delete from GiongCay where Id = @Id
         return
     end
@@ -223,7 +266,7 @@ END
 go
 
 -- =============================================
--- Procedures cho bảng LoaiGiongCayTrong
+-- Procedures cho bảng LoaiGiongCayTrong (không dùng nữa - đã có GiongCay)
 -- =============================================
 if exists (select * from sys.objects where type = 'P' and name = 'updateLoaiGiongCayTrong')
     drop proc updateLoaiGiongCayTrong
@@ -254,12 +297,12 @@ END
 go
 
 -- =============================================
--- Procedures cho bảng CoSoGiong_LoaiGiong
+-- Procedures cho bảng CoSoGiongLoaiGiong
 -- =============================================
-if exists (select * from sys.objects where type = 'P' and name = 'updateCoSoGiong_LoaiGiong')
-    drop proc updateCoSoGiong_LoaiGiong
+if exists (select * from sys.objects where type = 'P' and name = 'updateCoSoGiongLoaiGiong')
+    drop proc updateCoSoGiongLoaiGiong
 go
-create proc updateCoSoGiong_LoaiGiong
+create proc updateCoSoGiongLoaiGiong
 ( @action int
 , @Id int output
 , @CoSoId int = NULL
@@ -269,19 +312,19 @@ create proc updateCoSoGiong_LoaiGiong
 BEGIN
     if @action = -1
     begin
-        delete from CoSoGiong_LoaiGiong where Id = @Id
+        delete from CoSoGiongLoaiGiong where Id = @Id
         return
     end
     if @action = 0
     begin
-        update CoSoGiong_LoaiGiong set
+        update CoSoGiongLoaiGiong set
             CoSoId = @CoSoId,
             LoaiGiongId = @LoaiGiongId,
             GhiChu = @GhiChu
             where Id = @Id
         return
     end
-    insert into CoSoGiong_LoaiGiong values (@CoSoId,@LoaiGiongId,@GhiChu)
+    insert into CoSoGiongLoaiGiong values (@CoSoId,@LoaiGiongId,@GhiChu)
     set @Id = @@IDENTITY
 END
 go
@@ -346,6 +389,9 @@ create proc updateLoaiHinhSanXuatGo
 BEGIN
     if @action = -1
     begin
+        -- Xóa quan hệ với cơ sở trước
+        delete from CoSoCheBienGo where LoaiHinhSanXuatGoId = @Id
+        -- Sau đó xóa loại hình
         delete from LoaiHinhSanXuatGo where Id = @Id
         return
     end
@@ -377,6 +423,9 @@ create proc updateHinhThucHoatDongGo
 BEGIN
     if @action = -1
     begin
+        -- Xóa quan hệ với cơ sở trước
+        delete from CoSoCheBienGo where HinhThucHoatDongGoId = @Id
+        -- Sau đó xóa hình thức
         delete from HinhThucHoatDongGo where Id = @Id
         return
     end
@@ -487,6 +536,12 @@ create proc updateLoaiDongVat
 BEGIN
     if @action = -1
     begin
+        -- Xóa thống kê số lượng động vật trước
+        delete from ThongKeSoLuongDongVat where CoSoDongVatLoaiDongVatId in 
+            (select Id from CoSoDongVatLoaiDongVat where LoaiDongVatId = @Id)
+        -- Xóa quan hệ với cơ sở
+        delete from CoSoDongVatLoaiDongVat where LoaiDongVatId = @Id
+        -- Cuối cùng xóa loại động vật
         delete from LoaiDongVat where Id = @Id
         return
     end
@@ -508,6 +563,42 @@ END
 go
 
 -- =============================================
+-- Procedures cho bảng CoSoDongVatLoaiDongVat
+-- =============================================
+if exists (select * from sys.objects where type = 'P' and name = 'updateCoSoDongVatLoaiDongVat')
+    drop proc updateCoSoDongVatLoaiDongVat
+go
+create proc updateCoSoDongVatLoaiDongVat
+( @action int
+, @Id int output
+, @CoSoId int = NULL
+, @LoaiDongVatId int = NULL
+, @GhiChu nvarchar(200) = NULL
+) as
+BEGIN
+    if @action = -1
+    begin
+        -- Xóa thống kê số lượng trước
+        delete from ThongKeSoLuongDongVat where CoSoDongVatLoaiDongVatId = @Id
+        -- Sau đó xóa quan hệ
+        delete from CoSoDongVatLoaiDongVat where Id = @Id
+        return
+    end
+    if @action = 0
+    begin
+        update CoSoDongVatLoaiDongVat set
+            CoSoId = @CoSoId,
+            LoaiDongVatId = @LoaiDongVatId,
+            GhiChu = @GhiChu
+            where Id = @Id
+        return
+    end
+    insert into CoSoDongVatLoaiDongVat values (@CoSoId,@LoaiDongVatId,@GhiChu)
+    set @Id = @@IDENTITY
+END
+go
+
+-- =============================================
 -- Procedures cho bảng ThongKeSoLuongDongVat
 -- =============================================
 if exists (select * from sys.objects where type = 'P' and name = 'updateThongKeSoLuongDongVat')
@@ -516,15 +607,13 @@ go
 create proc updateThongKeSoLuongDongVat
 ( @action int
 , @Id int output
-, @CoSoId int = NULL
-, @LoaiDongVatId int = NULL
+, @CoSoDongVatLoaiDongVatId int = NULL
 , @LoaiKyBaoCaoId int = NULL
 , @Nam int = NULL
 , @KySo int = NULL
-, @GiaTriKy decimal(18,2) = NULL
-, @SoDauKy decimal(18,2) = NULL
-, @SoCuoiKy decimal(18,2) = NULL
+, @SoLuongLoai int = NULL
 , @GhiChu nvarchar(200) = NULL
+, @TenLoai nvarchar(150) = NULL
 ) as
 BEGIN
     if @action = -1
@@ -535,61 +624,18 @@ BEGIN
     if @action = 0
     begin
         update ThongKeSoLuongDongVat set
-            CoSoId = @CoSoId,
-            LoaiDongVatId = @LoaiDongVatId,
+            CoSoDongVatLoaiDongVatId = @CoSoDongVatLoaiDongVatId,
             LoaiKyBaoCaoId = @LoaiKyBaoCaoId,
             Nam = @Nam,
             KySo = @KySo,
-            GiaTriKy = @GiaTriKy,
-            SoDauKy = @SoDauKy,
-            SoCuoiKy = @SoCuoiKy,
-            GhiChu = @GhiChu
+            SoLuongLoai = @SoLuongLoai,
+            GhiChu = @GhiChu,
+            TenLoai = @TenLoai
             where Id = @Id
         return
     end
     insert into ThongKeSoLuongDongVat values (
-        @CoSoId,@LoaiDongVatId,@LoaiKyBaoCaoId,@Nam,@KySo,@GiaTriKy,@SoDauKy,@SoCuoiKy,@GhiChu
-    )
-    set @Id = @@IDENTITY
-END
-go
-
--- =============================================
--- Procedures cho bảng BienDongSoLuongDongVat
--- =============================================
-if exists (select * from sys.objects where type = 'P' and name = 'updateBienDongSoLuongDongVat')
-    drop proc updateBienDongSoLuongDongVat
-go
-create proc updateBienDongSoLuongDongVat
-( @action int
-, @Id int output
-, @CoSoId int = NULL
-, @LoaiDongVatId int = NULL
-, @LoaiBienDongId int = NULL
-, @NgayBienDong date = NULL
-, @SoLuong decimal(18,2) = NULL
-, @GhiChu nvarchar(200) = NULL
-) as
-BEGIN
-    if @action = -1
-    begin
-        delete from BienDongSoLuongDongVat where Id = @Id
-        return
-    end
-    if @action = 0
-    begin
-        update BienDongSoLuongDongVat set
-            CoSoId = @CoSoId,
-            LoaiDongVatId = @LoaiDongVatId,
-            LoaiBienDongId = @LoaiBienDongId,
-            NgayBienDong = @NgayBienDong,
-            SoLuong = @SoLuong,
-            GhiChu = @GhiChu
-            where Id = @Id
-        return
-    end
-    insert into BienDongSoLuongDongVat values (
-        @CoSoId,@LoaiDongVatId,@LoaiBienDongId,@NgayBienDong,@SoLuong,@GhiChu
+        @CoSoDongVatLoaiDongVatId,@LoaiKyBaoCaoId,@Nam,@KySo,@SoLuongLoai,@GhiChu,@TenLoai
     )
     set @Id = @@IDENTITY
 END
@@ -610,6 +656,11 @@ create proc updateNhomNguoiDung
 BEGIN
     if @action = -1
     begin
+        -- Xóa quyền nhóm trước
+        delete from QuyenNhom where GroupId = @Id
+        -- Xóa người dùng trong nhóm
+        delete from NguoiDungTrongNhom where GroupId = @Id
+        -- Cuối cùng xóa nhóm
         delete from NhomNguoiDung where Id = @Id
         return
     end
@@ -702,7 +753,7 @@ create proc getQuyenByUserName
 BEGIN
     select distinct T.Id, T.Ten
     from TacDong T
-    inner join QuyenNhom QN on T.Id = QN.TacDongId
+    inner join QuyenNhom QN on T.Id = QN
     inner join NguoiDungTrongNhom ND on QN.GroupId = ND.GroupId
     where ND.UserName = @UserName
 END

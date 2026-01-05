@@ -12,7 +12,6 @@ namespace Services
 
     public partial class GoService
     {
-        // 1. Cache danh mục (Loại hình sản xuất & Hình thức hoạt động)
         static List<LoaiHinhSanXuatGo> _dsLoaiHinh;
         static public List<LoaiHinhSanXuatGo> DanhMucLoaiHinh =>
             _dsLoaiHinh ?? (_dsLoaiHinh = Provider.Select<LoaiHinhSanXuatGo>());
@@ -21,7 +20,6 @@ namespace Services
         static public List<HinhThucHoatDongGo> DanhMucHinhThuc =>
             _dsHinhThuc ?? (_dsHinhThuc = Provider.Select<HinhThucHoatDongGo>());
 
-        // 2. Lấy dữ liệu thống kê của cơ sở
         static public List<ThongKeCoSoGo> LayLichSuThongKe(int coSoId)
         {
             return Provider.Select<ThongKeCoSoGo>()

@@ -21,6 +21,7 @@ namespace WinApp.Views
         public ActionContext SideMenu { get; set; }
         public object Model { get; set; }
         public string Title { get; set; }
+        public string BackUrl { get; set; }
         public IEnumerable TableColumns { get; set; }
         public IEnumerable Editors { get; set; } 
         public object Layout { get; set; }

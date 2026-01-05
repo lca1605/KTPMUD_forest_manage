@@ -19,6 +19,8 @@
     "coso/giong": "Cơ sở giống cây trồng",
     "coso/go": "Cơ sở chế biến gỗ",
     "coso/dongvat": "Cơ sở lưu giữ động vật",
+    "loaidongvat": "Loài động vật",
+    "loaigiong": "Loài giống",
     ".": ""
   },
   "actors": {
@@ -73,7 +75,7 @@
           },
           {
             "Text": "Giống cây trồng",
-            "Refs": [ "coso/giong" ]
+            "Refs": [ "coso/giong", "loaigiong" ]
           },
           {
             "Text": "Chế biến gỗ",
@@ -81,7 +83,7 @@
           },
           {
             "Text": "Sinh vật rừng",
-            "Refs": [ "coso/dongvat" ]
+            "Refs": [ "coso/dongvat", "loaidongvat" ]
           }
         ]
       }
@@ -111,7 +113,7 @@
           },
           {
             "Text": "Giống cây trồng",
-            "Refs": [ "coso/giong" ]
+            "Refs": [ "coso/giong", "loaigiong" ]
           },
           {
             "Text": "Chế biến gỗ",
@@ -119,7 +121,7 @@
           },
           {
             "Text": "Sinh vật rừng",
-            "Refs": [ "coso/dongvat" ]
+            "Refs": [ "coso/dongvat", "loaidongvat" ]
           }
         ]
       }

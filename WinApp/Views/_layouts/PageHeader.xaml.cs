@@ -23,6 +23,21 @@ namespace WinApp.Views
         public PageHeader()
         {
             InitializeComponent();
+            this.DataContextChanged += (s, e) => {
+                if (e.NewValue is ViewContext context && !string.IsNullOrEmpty(context.BackUrl))
+                {
+                    // Sử dụng ký tự mũi tên to (Left Arrow)
+                    BtnBack.SetAction(new ActionContext("\u2190", () => {
+                        System.Mvc.Engine.Execute(context.BackUrl);
+                    }));
+
+                    BtnBack.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    BtnBack.Visibility = Visibility.Collapsed;
+                }
+            };
         }
 
         public Vst.Controls.ButtonBase CreateAction(ActionContext context)

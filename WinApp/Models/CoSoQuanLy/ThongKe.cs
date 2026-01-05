@@ -25,6 +25,9 @@ namespace Models
     public class TableConfig
     {
         public string Title { get; set; }
+        public string ControllerName { get; set; }
+        public string AddAction { get; set; }
+        public string EditAction { get; set; }
         public System.Collections.IEnumerable Columns { get; set; }
         public System.Collections.IEnumerable Items { get; set; }
         public Func<object, int, int?, int?, bool> PeriodFilter { get; set; }
@@ -47,5 +50,9 @@ namespace Models
         public Vst.Controls.SearchBox SearchBox { get; set; }
         public List<PeriodInfo> AvailablePeriods { get; set; }
         public System.Windows.Controls.TextBlock PeriodLabel { get; set; }
+    }
+    static class AppContexts
+    {
+        public static int? CurrentCoSoId { get; set; }
     }
 }

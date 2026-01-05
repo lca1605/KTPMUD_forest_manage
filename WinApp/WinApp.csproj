@@ -70,6 +70,8 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HanhChinhController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoaiDongVatController.cs" />
+    <Compile Include="Controllers\LoaiGiongController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\MeController.cs" />
     <Compile Include="Controllers\MigrateController.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Models\UpdateContext.cs" />
     <Compile Include="Models\User\TaiKhoan.cs" />
     <Compile Include="Services\CoSoServices\CoSoService.cs" />
+    <Compile Include="Services\CoSoServices\DongVatService.cs" />
     <Compile Include="Services\CoSoServices\GiongService.cs" />
     <Compile Include="Services\CoSoServices\GoService.cs" />
     <Compile Include="Services\DonViService.cs" />
@@ -108,6 +111,8 @@
     <Compile Include="Views\Migrate\MigrateLayout.xaml.cs">
       <DependentUpon>MigrateLayout.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SinhVat\LoaiDongVat.cs" />
+    <Compile Include="Views\SinhVat\LoaiGiong.cs" />
     <Compile Include="Views\TaiKhoan\TaiKhoanManagerView.cs" />
     <Compile Include="Views\_layouts\FacilityReportLayout.xaml.cs">
       <DependentUpon>FacilityReportLayout.xaml</DependentUpon>
@@ -229,9 +234,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\BaoCaoCoSo\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="App_Data\301124_version moi.txt" />
     <Content Include="SQL\Procs.sql" />
