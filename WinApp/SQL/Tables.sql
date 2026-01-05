@@ -556,3 +556,112 @@ INSERT INTO BienDongSoLuongDongVat VALUES
     (5, 2, 4, '2025-03-01', 1, N'Bàn giao/thả tự nhiên 1 cá thể'),
     (6, 3, 3, '2025-01-15', 2, N'Tiếp nhận 2 cá thể trăn đất')
 GO
+
+/* =========================
+   8) User Activity History (Lịch sử hoạt động)
+   ========================= */
+CREATE TABLE UserActivityLog
+( Id INT PRIMARY KEY IDENTITY
+, TenDangNhap VARCHAR(50) NOT NULL FOREIGN KEY REFERENCES TaiKhoan(TenDangNhap)
+, HanhDong NVARCHAR(100) NOT NULL
+, ChucNang NVARCHAR(100) NULL
+, ThoiGian DATETIME NOT NULL DEFAULT GETDATE()
+, DiaChi NVARCHAR(200) NULL
+, GhiChu NVARCHAR(500) NULL
+)
+GO
+
+CREATE VIEW ViewUserActivityLog AS
+    SELECT 
+        UserActivityLog.*,
+        HoSo.Ten AS TenNguoiDung,
+        Quyen.Ten AS LoaiQuyen
+    FROM UserActivityLog
+    INNER JOIN TaiKhoan ON UserActivityLog.TenDangNhap = TaiKhoan.TenDangNhap
+    LEFT JOIN HoSo ON TaiKhoan.HoSoId = HoSo.Id
+    INNER JOIN Quyen ON TaiKhoan.QuyenId = Quyen.Id
+GO
+
+-- Thêm dữ liệu mẫu
+INSERT INTO UserActivityLog (TenDangNhap, HanhDong, ChucNang, ThoiGian, GhiChu) VALUES
+    ('admin', N'Đăng nhập', N'Hệ thống', '2025-01-04 08:00:00', N'Đăng nhập thành công'),
+    ('admin', N'Xem danh sách', N'Quản lý cơ sở', '2025-01-04 08:05:00', N'Xem danh sách cơ sở giống'),
+    ('cb_bk_01', N'Đăng nhập', N'Hệ thống', '2025-01-04 09:00:00', N'Đăng nhập thành công'),
+    ('cb_bk_01', N'Thêm mới', N'Quản lý cơ sở', '2025-01-04 09:10:00', N'Thêm cơ sở mới'),
+    ('cb_bk_02', N'Sửa', N'Quản lý cơ sở', '2025-01-04 10:00:00', N'Cập nhật thông tin cơ sở')
+GO
+
+/* =========================
+   9) User Groups - Bổ sung View
+   ========================= */
+CREATE VIEW ViewNhomNguoiDung AS
+    SELECT 
+        NhomNguoiDung.*,
+        DonVi.Ten AS TenDonVi,
+        DonVi.TenHanhChinh AS CapDonVi
+    FROM NhomNguoiDung
+    INNER JOIN DonVi ON NhomNguoiDung.MaDonViId = DonVi.Id
+GO
+
+CREATE VIEW ViewNguoiDungTrongNhom AS
+    SELECT 
+        NguoiDungTrongNhom.*,
+        NhomNguoiDung.TenNhom,
+        HoSo.Ten AS TenNguoiDung,
+        TaiKhoan.QuyenId,
+        Quyen.Ten AS TenQuyen
+    FROM NguoiDungTrongNhom
+    INNER JOIN NhomNguoiDung ON NguoiDungTrongNhom.GroupId = NhomNguoiDung.Id
+    INNER JOIN TaiKhoan ON NguoiDungTrongNhom.UserName = TaiKhoan.TenDangNhap
+    LEFT JOIN HoSo ON TaiKhoan.HoSoId = HoSo.Id
+    INNER JOIN Quyen ON TaiKhoan.QuyenId = Quyen.Id
+GO
+
+/* =========================
+   Lịch sử đăng nhập
+   ========================= */
+CREATE TABLE LichSuDangNhap
+( Id INT PRIMARY KEY IDENTITY
+, Ten VARCHAR(50) NOT NULL
+, ThoiGian DATETIME NOT NULL DEFAULT GETDATE()
+, TrangThai NVARCHAR(50) NULL
+, GhiChu NVARCHAR(500) NULL
+)
+GO
+
+INSERT INTO LichSuDangNhap (Ten, ThoiGian, TrangThai, GhiChu) VALUES
+    ('admin', '2025-01-04 08:00:00', N'Thành công', NULL),
+    ('cb_bk_01', '2025-01-04 09:00:00', N'Thành công', NULL),
+    ('cb_bk_02', '2025-01-04 09:30:00', N'Thất bại', N'Sai mật khẩu')
+GO
+
+CREATE VIEW ViewLichSuDangNhap AS
+    SELECT LichSuDangNhap.*, HoSo.Ten AS TenNguoiDung
+    FROM LichSuDangNhap
+    LEFT JOIN HoSo ON LichSuDangNhap.Ten = HoSo.SDT
+GO
+
+/* =========================
+   Lịch sử tác động
+   ========================= */
+CREATE TABLE LichSuTacDong
+( Id INT PRIMARY KEY IDENTITY
+, Ten VARCHAR(50) NOT NULL
+, HanhDong NVARCHAR(100) NOT NULL
+, ChucNang NVARCHAR(100) NULL
+, ThoiGian DATETIME NOT NULL DEFAULT GETDATE()
+, GhiChu NVARCHAR(500) NULL
+)
+GO
+
+INSERT INTO LichSuTacDong (Ten, HanhDong, ChucNang, ThoiGian, GhiChu) VALUES
+    ('admin', N'Xem', N'Quản lý cơ sở', '2025-01-04 08:05:00', NULL),
+    ('cb_bk_01', N'Thêm', N'Quản lý cơ sở', '2025-01-04 09:10:00', N'Thêm cơ sở mới'),
+    ('cb_bk_02', N'Sửa', N'Quản lý cơ sở', '2025-01-04 10:00:00', NULL)
+GO
+
+CREATE VIEW ViewLichSuTacDong AS
+    SELECT LichSuTacDong.*, HoSo.Ten AS TenNguoiDung
+    FROM LichSuTacDong
+    LEFT JOIN HoSo ON LichSuTacDong.Ten = HoSo.SDT
+GO
