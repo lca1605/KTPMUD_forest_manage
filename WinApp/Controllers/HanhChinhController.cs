@@ -54,6 +54,7 @@ namespace WinApp.Controllers
                 TrucThuocId = e.TrucThuocId
             };
 
+            GhiLichSu("INSERT", $"thêm đơn vị hành chính: {e.Ten}");
             ExecSQL(DonViDb.CreateInsertSql(donVi));
         }
 
@@ -68,11 +69,13 @@ namespace WinApp.Controllers
                 TrucThuocId = e.TrucThuocId
             };
 
+            GhiLichSu("UPDATE", $"cập nhật đơn vị hành chính: {e.Ten}");
             ExecSQL(DonViDb.CreateUpdateSql(donVi));
         }
 
         protected override void TryDelete(ViewDonVi e)
         {
+            GhiLichSu("DELETE", $"xóa đơn vị hành chính: {e.Ten}");
             ExecSQL(DonViDb.CreateDeleteSql(new DonVi { Id = e.Id }));
         } 
     }

@@ -70,6 +70,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HanhChinhController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LichSuTacDongController.cs" />
     <Compile Include="Controllers\LoaiDongVatController.cs" />
     <Compile Include="Controllers\LoaiGiongController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Models\CoSoQuanLy\GiongCay.cs" />
     <Compile Include="Models\CoSoQuanLy\Go.cs" />
     <Compile Include="Models\CoSoQuanLy\ThongKe.cs" />
+    <Compile Include="Models\User\LichSuThaoTacNguoiDung.cs" />
     <Compile Include="Models\User\NhomNguoiDung.cs" />
     <Compile Include="Models\HanhChinhQuanLy\DonViHanhChinh.cs" />
     <Compile Include="Models\UpdateContext.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="Services\CoSoServices\GiongService.cs" />
     <Compile Include="Services\CoSoServices\GoService.cs" />
     <Compile Include="Services\DonViService.cs" />
+    <Compile Include="Views\Admin\LichSuTacDong.cs" />
     <Compile Include="Views\Admin\Test.cs" />
     <Compile Include="Views\BaseView.cs" />
     <Compile Include="Views\CoSo\DongVat.cs" />

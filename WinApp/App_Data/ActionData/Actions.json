@@ -21,6 +21,7 @@
     "coso/dongvat": "Cơ sở lưu giữ động vật",
     "loaidongvat": "Loài động vật",
     "loaigiong": "Loài giống",
+    "lichsutacdong": "Lịch sử tác động",
     ".": ""
   },
   "actors": {
@@ -55,7 +56,7 @@
         "Childs": [
           {
             "Text": "Người dùng",
-            "Refs": [ "taikhoan", "taikhoan/lichsu" ]
+            "Refs": [ "taikhoan", "lichsutacdong" ]
           },
           {
             "Text": "Hành chính",

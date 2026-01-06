@@ -27,20 +27,6 @@ namespace WinApp.Controllers
             Generator = new CSharp();
             return View();
         }
-        //public object Gen(DataSchema.Table table)
-        //{
-        //    return View(engine.Run(table));
-        //}
-        //public object Gen(string mode)
-        //{
-        //    var m = App.User.SideMenu;
-        //    if (m == null || m.Childs == null)
-        //    {
-        //        CreateMenu();
-        //    }
-        //    Engine.Mode = mode;
-        //    return View(Engine.Run(null));
-        //}
 
         protected override ActionResult View(IView view, object model)
         {

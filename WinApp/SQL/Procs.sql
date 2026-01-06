@@ -758,3 +758,47 @@ BEGIN
     where ND.UserName = @UserName
 END
 go
+
+-- =============================================
+-- Procedures cho bảng LichSuTacDong (Phần 8)
+-- =============================================
+if exists (select * from sys.objects where type = 'P' and name = 'updateLichSuTacDong')
+    drop proc updateLichSuTacDong
+go
+create proc updateLichSuTacDong
+( @action int
+, @Id int output
+, @TenTaiKhoan varchar(50) = NULL
+, @TacDongId int = NULL
+, @ThoiGian datetime = NULL
+, @MoTa nvarchar(300) = NULL
+) as
+BEGIN
+    if @action = -1
+    begin
+        -- Xóa lịch sử tác động
+        delete from LichSuTacDong where Id = @Id
+        return
+    end
+    if @action = 0
+    begin
+        -- Cập nhật lịch sử tác động
+        update LichSuTacDong set
+            TenTaiKhoan = @TenTaiKhoan,
+            TacDongId = @TacDongId,
+            ThoiGian = @ThoiGian,
+            MoTa = @MoTa
+            where Id = @Id
+        return
+    end
+    -- Thêm mới lịch sử tác động
+    -- Nếu không truyền ThoiGian, dùng GETDATE()
+    if @ThoiGian is null
+        set @ThoiGian = GETDATE()
+    
+    insert into LichSuTacDong values (
+        @TenTaiKhoan, @TacDongId, @ThoiGian, @MoTa
+    )
+    set @Id = @@IDENTITY
+END
+go

@@ -200,6 +200,7 @@ namespace WinApp.Views
                     e[0].Control.GetInput().Focus();
                     return;
                 }
+
                 RaiseUpdate();
             };
 

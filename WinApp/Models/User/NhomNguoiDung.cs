@@ -19,12 +19,6 @@ namespace Models
         public int? GroupId { get; set; }
     }
 
-    public partial class TacDong
-    {
-        public int? Id { get; set; }
-        public string Ten { get; set; }
-    }
-
     public partial class QuyenNhom
     {
         public int? GroupId { get; set; }

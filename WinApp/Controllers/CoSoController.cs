@@ -16,7 +16,6 @@ namespace WinApp.Controllers
 
         public override object Index()
         {
-            CheckUserActivity();
             return View(CoSoService.DanhSach(CoSoService.LoaiCoSoDangXuLy));
 
         }
@@ -28,19 +27,16 @@ namespace WinApp.Controllers
 
         public object Giong()
         {
-            CheckUserActivity();
             return View(Select(1));
         }
 
         public object Go()
         {
-            CheckUserActivity();
             return View(Select(2));
         }
 
         public object DongVat()
         {
-            CheckUserActivity();
             return View(Select(3));
         }
 
@@ -55,19 +51,16 @@ namespace WinApp.Controllers
 
         public object BaoCaoGiong(int id)
         {
-            CheckUserActivity();
             return View(id);
         }
 
         public object BaoCaoGo(int id)
         {
-            CheckUserActivity();
             return View(id);
         }
 
         public object BaoCaoDongVat(int id)
         {
-            CheckUserActivity();
             return View(id);
         }
 
@@ -88,6 +81,7 @@ namespace WinApp.Controllers
                 NguoiDaiDien = e.NguoiDaiDien
             };
 
+            GhiLichSu("INSERT", $"thêm mới cơ sở: {e.Ten}");
             var sql = CoSoDb.CreateInsertSql(coSo);
             ExecSQL(sql);
         }
@@ -96,7 +90,6 @@ namespace WinApp.Controllers
         {
             var coSo = new CoSo
             {
-                Id = e.Id,
                 DonViId = e.DonViId,
                 LoaiCoSoId = e.LoaiCoSoId,
                 Ten = e.Ten,
@@ -105,11 +98,13 @@ namespace WinApp.Controllers
                 NguoiDaiDien = e.NguoiDaiDien
             };
 
+            GhiLichSu("UPDATE", $"cập nhật cơ sở: {e.Ten}");
             ExecSQL(CoSoDb.CreateUpdateSql(coSo));
         }
 
         protected override void TryDelete(ViewCoSo e)
         {
+            GhiLichSu("DELETE", $"cóa cơ sở: {e.Ten}");
             ExecSQL(CoSoDb.CreateDeleteSql(new CoSo { Id = e.Id }));
         }
         #endregion

@@ -419,7 +419,7 @@ namespace Vst.Controls
     {
         public PasswordBox()
         {
-        }    
+        }
         protected override object GetEditValue() => input.Password;
         protected override void SetEditValue(object v) => input.Password = $"{v}";
         public override void SelectAll() => input.SelectAll();

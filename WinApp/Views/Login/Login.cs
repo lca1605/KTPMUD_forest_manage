@@ -14,7 +14,7 @@ namespace WinApp.Views.Login
         {
             base.RenderCore(context);
             context.Editors = new object[] {
-                new EditorInfo { Name = "Ten", Caption = "Tên người dùng",  Type = "select", Options = "admin;dev", Placeholder = "Tên người dùng" },
+                new EditorInfo { Name = "TenDangNhap", Caption = "Tên đăng nhập" },
                 new EditorInfo { Name = "MatKhau", Type = "password", Caption = "Mật khẩu", Placeholder = "Mật khẩu" },
                 //new EditorInfo { Name = "Keep", Type = "check", Caption = "Tự động đăng nhập cho lần sau" },
             };

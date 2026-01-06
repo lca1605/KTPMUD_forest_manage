@@ -128,89 +128,6 @@ CREATE VIEW ViewHoSo AS
 GO
 
 /* =========================
-   3) NhomNguoiDung
-   ========================= */
-CREATE TABLE NhomNguoiDung
-( Id INT PRIMARY KEY IDENTITY
-, MaDonViId INT NOT NULL FOREIGN KEY REFERENCES DonVi(Id)
-, TenNhom NVARCHAR(100) NOT NULL
-)
-GO
-
-INSERT INTO NhomNguoiDung VALUES
-    (1, N'Nhóm Thành phố Hà Nội'),
-    (2, N'Nhóm Quận Hai Bà Trưng'),
-    (3, N'Nhóm Phường Bách Khoa'),
-    (5, N'Nhóm Tỉnh Thái Bình'),
-    (6, N'Nhóm Huyện Thái Thụy'),
-    (7, N'Nhóm Xã Thụy Hải')
-GO
-
-ALTER TABLE NhomNguoiDung
-ADD CONSTRAINT UQ_NhomNguoiDung_MaDonVi UNIQUE (MaDonViId)
-GO
-
-CREATE TABLE NguoiDungTrongNhom
-( UserName VARCHAR(50) NOT NULL FOREIGN KEY REFERENCES TaiKhoan(TenDangNhap)
-, GroupId INT NOT NULL FOREIGN KEY REFERENCES NhomNguoiDung(Id)
-, PRIMARY KEY (UserName, GroupId)
-)
-GO
-
-ALTER TABLE NguoiDungTrongNhom
-ADD CONSTRAINT UQ_NguoiDungTrongNhom_User UNIQUE (UserName)
-GO
-
-INSERT INTO NguoiDungTrongNhom VALUES
-    ('cb_hanoi', 1),
-    ('cb_hbt_01', 2),
-    ('cb_bk_01', 3),
-    ('cb_bk_02', 3),
-    ('cb_thaibinh', 4),
-    ('cb_thaithuy', 5),
-    ('cb_thuyhai', 6)
-GO
-
-CREATE TABLE TacDong
-( Id INT PRIMARY KEY IDENTITY
-, Ten NVARCHAR(50) NOT NULL
-)
-GO
-
-INSERT INTO TacDong VALUES
-    (N'Xem'),
-    (N'Thêm'),
-    (N'Sửa'),
-    (N'Xóa'),
-    (N'Duyệt')
-GO
-
-CREATE TABLE QuyenNhom
-( GroupId INT NOT NULL FOREIGN KEY REFERENCES NhomNguoiDung(Id)
-, TacDongId INT NOT NULL FOREIGN KEY REFERENCES TacDong(Id)
-, PRIMARY KEY (GroupId, TacDongId)
-)
-GO
-
--- Nhóm Tỉnh/Thành: full 1..5
-INSERT INTO QuyenNhom VALUES
-    (1,1),(1,2),(1,3),(1,4),(1,5),   -- Hà Nội
-    (4,1),(4,2),(4,3),(4,4),(4,5)    -- Thái Bình
-GO
-
--- Nhóm Huyện/Quận: full 1..5
-INSERT INTO QuyenNhom VALUES
-    (2,1),(2,2),(2,3),(2,4),(2,5),   -- Hai Bà Trưng
-    (5,1),(5,2),(5,3),(5,4),(5,5)    -- Thái Thụy
-GO
-
--- Nhóm Xã/Phường: 1..4 (không duyệt)
-INSERT INTO QuyenNhom VALUES
-    (3,1),(3,2),(3,3),(3,4),         -- Bách Khoa
-    (6,1),(6,2),(6,3),(6,4)          -- Thụy Hải
-GO
-
-/* =========================
    LoaiKyBaoCao
    ========================= */
 CREATE TABLE LoaiKyBaoCao
@@ -661,4 +578,28 @@ INSERT INTO ThongKeSoLuongDongVat VALUES
     (8, 1, 2024, 1, 50, N'Tháng 1/2024', 'Rùa núi vàng'),
     (8, 1, 2024, 6, 55, N'Tháng 6/2024', 'Rùa núi vàng'),
     (8, 1, 2024, 12, 60, N'Tháng 12/2024', 'Rùa núi vàng')
+GO
+
+/* =========================
+   8) Lich Su Thao Tac Nguoi Dung
+   ========================= */
+CREATE TABLE TacDong
+( Id INT PRIMARY KEY IDENTITY
+, Ma NVARCHAR(50) NOT NULL
+)
+GO
+
+INSERT INTO TacDong VALUES
+    (N'INSERT'),
+    (N'DELETE'),
+    (N'UPDATE')
+GO
+
+CREATE TABLE LichSuTacDong
+( Id INT PRIMARY KEY IDENTITY
+, TenTaiKhoan NVARCHAR(100) NOT NULL
+, TacDongId INT NOT NULL FOREIGN KEY REFERENCES TacDong(Id)
+, ThoiGian DATETIME NOT NULL DEFAULT GETDATE()
+, MoTa NVARCHAR(300) NULL
+)
 GO

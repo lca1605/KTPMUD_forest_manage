@@ -21,16 +21,14 @@ namespace WinApp.Controllers
                 UpdateContext.Message = "Đã có giong cay " + e.Ten + " tu nguon " + e.Nguon;
                 return;
             }
+            GhiLichSu("INSERT", $"thêm loài giống: {e.Ten}");
             ExecSQL(LoaiGiongDb.CreateInsertSql(e));
-        }
-        protected override void TryUpdate(GiongCay e)
-        {
-            ExecSQL(LoaiGiongDb.CreateUpdateSql(e));
         }
         protected override void TryDelete(GiongCay e)
         {
             string sqlDeleteRelative = $"DELETE FROM CoSoGiongLoaiGiong WHERE LoaiGiongId = {e.Id}";
             ExecSQL(sqlDeleteRelative);
+            GhiLichSu("DELETE", $"xóa loài giống: {e.Ten}");
             ExecSQL(LoaiGiongDb.CreateDeleteSql(e));
         }
     }

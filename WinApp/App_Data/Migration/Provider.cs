@@ -109,11 +109,23 @@ namespace System
                 if (value == null)
                     return "NULL";
 
+                if (value is DateTime dt)
+                {
+                    return $"'{dt:yyyy-MM-dd HH:mm:ss}'";
+                }
+
+                if (value is DateTimeOffset dto)
+                {
+                    return $"'{dto:yyyy-MM-dd HH:mm:ss}'";
+                }
+
                 var s = $"'{value}'";
                 if (value is string)
                     s = 'N' + s;
+
                 return s;
             }
+
             public string GetUpdateEntityValue(Type type, object entity)
             {
                 var p = type.GetProperty(Name);

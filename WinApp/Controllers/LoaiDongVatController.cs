@@ -25,16 +25,19 @@ namespace WinApp.Controllers
                 UpdateContext.Message = "Đã có tên khoa học: " + e.TenKhoaHoc;
                 return;
             }
+            GhiLichSu("INSERT", $"thêm loài động vật: {e.TenTiengViet}");
             ExecSQL(LoaiDongVatDb.CreateInsertSql(e));
         }
         protected override void TryUpdate(LoaiDongVat e)
         {
+            GhiLichSu("UPDATE", $"cập nhật loài động vật: {e.TenTiengViet}");
             ExecSQL(LoaiDongVatDb.CreateUpdateSql(e));
         }
         protected override void TryDelete(LoaiDongVat e)
         {
             string sqlDeleteRelative = $"DELETE FROM CoSoDongVatLoaiDongVat WHERE LoaiDongVatId = {e.Id}";
             ExecSQL(sqlDeleteRelative);
+            GhiLichSu("DELETE", $"xóa loài động vật: {e.TenTiengViet}");
             ExecSQL(LoaiDongVatDb.CreateDeleteSql(e));
         }
     }

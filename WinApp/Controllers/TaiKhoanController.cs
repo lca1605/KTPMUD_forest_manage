@@ -44,16 +44,18 @@ namespace WinApp.Controllers
             };
             sql = TaiKhoanDb.CreateInsertSql(acc);
             ExecSQL(sql);
+            GhiLichSu("INSERT", $"thêm tài khoản: {e.TenDangNhap}");
 
         }
         protected override void TryUpdate(ViewHoSo e)
         {
+            GhiLichSu("UPDATE", $"cập nhật tài khoản: {e.TenDangNhap}");
             ExecSQL(HoSoDb.CreateUpdateSql(e));
         }
         protected override void TryDelete(ViewHoSo e)
         {
             ExecSQL(TaiKhoanDb.CreateDeleteSql(new TaiKhoan { TenDangNhap = e.TenDangNhap }));
-
+            GhiLichSu("DELETE", $"xóa tài khoản: {e.TenDangNhap}");
             ExecSQL(HoSoDb.CreateDeleteSql(e));
         }
     }

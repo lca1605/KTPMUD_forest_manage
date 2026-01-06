@@ -28,7 +28,6 @@ namespace WinApp.Controllers
 
         public virtual object Index()
         {
-            CheckUserActivity(); // Kích hoạt tracking
             return View();
         }
     }
@@ -47,30 +46,24 @@ namespace WinApp.Controllers
         }
         public override object Index()
         {
-            CheckUserActivity();
             return View(DataEngine.ToList<T>(null, null));
         }
         public virtual object Delete(T entity)
         {
-            CheckUserActivity();
             return View(new EditContext(entity, EditActions.Delete));
         }
         public virtual object Edit(T entity)
         {
-            CheckUserActivity();
             return View(new EditContext(entity));
         }
         public virtual object Add()
         {
-            CheckUserActivity();
             return View(new EditContext(CreateEntity(), EditActions.Insert));
         }
 
         protected UpdateContext UpdateContext { get; set; }
         public object Update(EditContext context)
         {
-            CheckUserActivity();
-
             UpdateContext = new UpdateContext
             {
                 Action = context.Action,
@@ -82,6 +75,25 @@ namespace WinApp.Controllers
             if (UpdateContext.Message != null)
                 return UpdateError();
             return UpdateSuccess();
+        }
+
+        protected void GhiLichSu(string maTacDong, string ghiChu = "")
+        {
+            var TenDangNhap = App.User?.UserName;
+            if (string.IsNullOrEmpty(TenDangNhap))
+            {
+                TenDangNhap = "admin";
+            }
+            var log = new LichSuTacDong
+            {  
+                TenTaiKhoan = TenDangNhap,
+                TacDongId = (int?)Provider.GetTable("TacDong").GetValue("Id", $"Ma = '{maTacDong}'"),
+                ThoiGian = DateTime.Now,
+                MoTa = TenDangNhap + " đã " + ghiChu
+            };
+
+            var sql = Provider.GetTable<LichSuTacDong>().CreateInsertSql(log);
+            ExecSQL(sql);
         }
 
         protected virtual void TryInsert(T e)
