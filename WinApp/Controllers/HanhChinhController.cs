@@ -29,8 +29,6 @@ namespace WinApp.Controllers
 
         public object Huyen() => View(Select(2));
         public object Xa() => View(Select(3));
-
-        // ====== ERROR ======
         protected override object Error(int code, string message)
         {
             if (UpdateContext.Action == EditActions.Delete)

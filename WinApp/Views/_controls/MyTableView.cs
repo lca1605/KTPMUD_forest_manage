@@ -14,10 +14,10 @@ namespace Vst.Controls
     public class TableColumn
     {
         string _header;
-        public string Caption 
+        public string Caption
         {
-            get => _header ?? Name; 
-            set => _header = value; 
+            get => _header ?? Name;
+            set => _header = value;
         }
         public double Width { get; set; }
         public string Name { get; set; }
@@ -41,7 +41,8 @@ namespace Vst.Controls
     {
         protected virtual TableCell CreateCell(TableColumn column)
         {
-            return new TableCell {
+            return new TableCell
+            {
                 HorizontalTextAlignment = column.HorizontalAlignment,
                 Background = column.Background,
                 Foreground = column.Foreground,
@@ -53,7 +54,7 @@ namespace Vst.Controls
             Children.Clear();
 
             foreach (var col in cols)
-            {   
+            {
                 Children.Add(CreateCell(col));
             }
             Split(0, cols.Length);
@@ -81,8 +82,10 @@ namespace Vst.Controls
     }
     public class TableHeader : TableRow
     {
-        protected override TableCell CreateCell(TableColumn column) {
-            return new TableHeaderCell { 
+        protected override TableCell CreateCell(TableColumn column)
+        {
+            return new TableHeaderCell
+            {
                 Text = column.Caption,
                 HorizontalTextAlignment = column.HorizontalAlignment
             };
@@ -90,6 +93,52 @@ namespace Vst.Controls
     }
     public class TableView : Border
     {
+        // Controls how cell text behaves when it exceeds the visible width.
+        public enum CellOverflowMode
+        {
+            None = 0,
+            Wrap = 1,
+        }
+
+        public static readonly DependencyProperty OverflowModeProperty =
+            DependencyProperty.Register(nameof(OverflowMode),
+            typeof(CellOverflowMode),
+            typeof(TableView),
+            new PropertyMetadata(CellOverflowMode.None));
+
+        public CellOverflowMode OverflowMode
+        {
+            get => (CellOverflowMode)GetValue(OverflowModeProperty);
+            set => SetValue(OverflowModeProperty, value);
+        }
+
+        // Maximum number of visible lines when OverflowMode = Wrap.
+        // The full original text can still be seen via ToolTip (if enabled).
+        public static readonly DependencyProperty WrapMaxLinesProperty =
+            DependencyProperty.Register(nameof(WrapMaxLines),
+            typeof(int),
+            typeof(TableView),
+            new PropertyMetadata(2));
+
+        public int WrapMaxLines
+        {
+            get => (int)GetValue(WrapMaxLinesProperty);
+            set => SetValue(WrapMaxLinesProperty, value);
+        }
+
+        public static readonly DependencyProperty ShowFullTextOnToolTipProperty =
+            DependencyProperty.Register(nameof(ShowFullTextOnToolTip),
+            typeof(bool),
+            typeof(TableView),
+            new PropertyMetadata(true));
+
+        public bool ShowFullTextOnToolTip
+        {
+            get => (bool)GetValue(ShowFullTextOnToolTipProperty);
+            set => SetValue(ShowFullTextOnToolTipProperty, value);
+        }
+
+
         public static readonly DependencyProperty ColumnsProperty =
             DependencyProperty.RegisterAttached(nameof(Columns),
             typeof(TableColumnCollection),
@@ -98,13 +147,15 @@ namespace Vst.Controls
         public TableColumnCollection Columns
         {
             get { return (TableColumnCollection)GetValue(ColumnsProperty); }
-            set {
+            set
+            {
                 SetValue(ColumnsProperty, value);
             }
         }
 
         TableHeader header = new TableHeader();
-        StackPanel body = new StackPanel { 
+        StackPanel body = new StackPanel
+        {
             Background = Brushes.White
         };
         ScrollBar vscroll;
@@ -151,7 +202,7 @@ namespace Vst.Controls
                             foreach (var e in ie)
                                 lst.Add(e);
                         }
-                    }    
+                    }
                     if (lst != null)
                     {
                         items = new object[lst.Count];
@@ -159,7 +210,7 @@ namespace Vst.Controls
                         foreach (var e in value) items[i++] = e;
                     }
                 }
-                
+
                 vscroll.Maximum = 0;
                 vscroll.Maximum = items.Length - 1;
 
@@ -219,7 +270,7 @@ namespace Vst.Controls
         TableColumn[] GetRenderColumns()
         {
             var lst = new List<TableColumn> {
-                new TableColumn { Width = RowIndexWidth, 
+                new TableColumn { Width = RowIndexWidth,
                     HorizontalAlignment = HorizontalAlignment.Right }
             };
             lst.AddRange(Columns);
@@ -236,7 +287,8 @@ namespace Vst.Controls
             var cols = GetRenderColumns();
             for (int i = 0; i < visibleRows; i++)
             {
-                var iv = new TableRow {
+                var iv = new TableRow
+                {
                     Height = h,
                 };
                 iv.SetColumns(cols);
@@ -288,9 +340,112 @@ namespace Vst.Controls
                     }
 
                     var name = cols[e.ColumnIndex].Name;
-                    e.Text = name == null ? null : doc.GetString(name);
+                    var raw = name == null ? null : doc.GetString(name);
+
+                    if (OverflowMode == CellOverflowMode.Wrap && !string.IsNullOrEmpty(raw))
+                    {
+                        if (ShowFullTextOnToolTip) e.ToolTip = raw;
+                        e.Text = WrapAndEllipsize(raw, WrapMaxLines, GetMaxCharsPerLine(e, cols[e.ColumnIndex]));
+                    }
+                    else
+                    {
+                        e.Text = raw;
+                    }
                 }
             }
+        }
+
+
+        private static int GetMaxCharsPerLine(FrameworkElement cell, TableColumn col)
+        {
+            // Prefer configured column width; fall back to measured cell width.
+            var w = col?.Width ?? 0;
+            if (w <= 0) w = cell.ActualWidth;
+            if (w <= 0) w = 200; // safe fallback
+
+            var fontSize = 12.0;
+            try { fontSize = cell is Control c ? c.FontSize : fontSize; } catch { }
+
+            // Heuristic: average character width ≈ 0.6 * fontSize
+            var max = (int)(w / Math.Max(1.0, fontSize * 0.6));
+            return Math.Max(12, max - 1); // subtract a small padding
+        }
+
+        private static string WrapAndEllipsize(string text, int maxLines, int maxCharsPerLine)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            maxLines = Math.Max(1, maxLines);
+            maxCharsPerLine = Math.Max(8, maxCharsPerLine);
+
+            // Normalize newlines; preserve explicit line breaks as paragraph boundaries.
+            var paragraphs = text.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+
+            var lines = new List<string>();
+            foreach (var p in paragraphs)
+            {
+                if (lines.Count >= maxLines + 1) break;
+
+                var words = p.Split(new[] { ' ' }, StringSplitOptions.None);
+                var current = new StringBuilder();
+
+                foreach (var word in words)
+                {
+                    if (lines.Count >= maxLines + 1) break;
+
+                    var token = word ?? string.Empty;
+                    if (current.Length == 0)
+                    {
+                        // If a single word is too long, hard-break it.
+                        while (token.Length > maxCharsPerLine)
+                        {
+                            lines.Add(token.Substring(0, maxCharsPerLine));
+                            token = token.Substring(maxCharsPerLine);
+                            if (lines.Count >= maxLines + 1) break;
+                        }
+                        if (lines.Count >= maxLines + 1) break;
+                        current.Append(token);
+                        continue;
+                    }
+
+                    // Add with a preceding space.
+                    if (current.Length + 1 + token.Length <= maxCharsPerLine)
+                    {
+                        current.Append(' ').Append(token);
+                    }
+                    else
+                    {
+                        lines.Add(current.ToString());
+                        current.Clear();
+
+                        // Start a new line with this word (hard-break if needed).
+                        while (token.Length > maxCharsPerLine)
+                        {
+                            lines.Add(token.Substring(0, maxCharsPerLine));
+                            token = token.Substring(maxCharsPerLine);
+                            if (lines.Count >= maxLines + 1) break;
+                        }
+                        if (lines.Count >= maxLines + 1) break;
+                        current.Append(token);
+                    }
+                }
+
+                if (current.Length > 0) lines.Add(current.ToString());
+            }
+
+            // If we produced more than maxLines, truncate with ellipsis on the last visible line.
+            if (lines.Count > maxLines)
+            {
+                var kept = lines.Take(maxLines).ToList();
+                var last = kept[maxLines - 1];
+
+                if (last.Length > maxCharsPerLine - 3)
+                    last = last.Substring(0, Math.Max(0, maxCharsPerLine - 3));
+
+                kept[maxLines - 1] = (last ?? string.Empty).TrimEnd() + "...";
+                return string.Join("\n", kept);
+            }
+
+            return string.Join("\n", lines);
         }
 
         protected override void OnRender(DrawingContext dc)
@@ -308,13 +463,15 @@ namespace Vst.Controls
         {
             Columns = new TableColumnCollection();
 
-            var grid = new GridLayout { 
+            var grid = new GridLayout
+            {
                 Children = { header, body },
             };
             grid.Split(2, 1);
             grid.Rows[0].Height = new GridLength(RowHeight);
 
-            vscroll = new ScrollBar { 
+            vscroll = new ScrollBar
+            {
                 Orientation = Orientation.Vertical,
                 HorizontalAlignment = HorizontalAlignment.Right,
             };
@@ -327,9 +484,9 @@ namespace Vst.Controls
             PreviewMouseDown += (s, e) => {
                 Focus();
             };
-            
+
             TableRow mouse_over = null;
-            Action<bool> on_row_over = b => { 
+            Action<bool> on_row_over = b => {
                 if (mouse_over != null)
                 {
                     mouse_over.Background = b ? RowOverBackground : Brushes.Transparent;
@@ -363,7 +520,7 @@ namespace Vst.Controls
                 FirstRow -= (int)(d / RowHeight);
             };
             body.MouseLeave += (s, e) => on_row_over(false);
-            
+
             Application.Current.MainWindow.PreviewKeyDown += (s, e) => {
                 if (!IsFocused) return;
 

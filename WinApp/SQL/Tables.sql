@@ -157,39 +157,66 @@ INSERT INTO LoaiCoSo VALUES
     (N'Cơ sở lưu giữ động vật')
 GO
 
+CREATE TABLE DiaChi
+( Id INT PRIMARY KEY IDENTITY
+, DiaChiDayDu NVARCHAR(200) NULL
+, Lat DECIMAL(9,6) NULL
+, Lng DECIMAL(9,6) NULL
+, CONSTRAINT CK_DiaChi_Lat CHECK (Lat IS NULL OR (Lat BETWEEN -90 AND 90))
+, CONSTRAINT CK_DiaChi_Lng CHECK (Lng IS NULL OR (Lng BETWEEN -180 AND 180))
+)
+GO
+
 CREATE TABLE CoSo
 ( Id INT PRIMARY KEY IDENTITY
 , DonViId INT NOT NULL FOREIGN KEY REFERENCES DonVi(Id)
 , LoaiCoSoId INT NOT NULL FOREIGN KEY REFERENCES LoaiCoSo(Id)
 , Ten NVARCHAR(150) NOT NULL
-, DiaChi NVARCHAR(200) NULL
+, DiaChiId INT NULL FOREIGN KEY REFERENCES DiaChi(Id)
 , SDT VARCHAR(20) NULL
 , NguoiDaiDien NVARCHAR(100) NULL
 )
 GO
 
-INSERT INTO CoSo VALUES
-    (3, 1, N'Cơ sở Giống Bách Khoa 01', N'Bách Khoa, Hai Bà Trưng, Hà Nội', '0901000001', N'Đào Minh Phúc'),
-    (4, 1, N'Cơ sở Giống Đồng Tâm 01', N'Đồng Tâm, Hai Bà Trưng, Hà Nội', '0901000002', N'Lê Quốc Anh'),
-    (3, 2, N'Cơ sở Gỗ Bách Khoa 01', N'Bách Khoa, Hai Bà Trưng, Hà Nội', '0902000001', N'Nguyễn Văn Hùng'),
-    (4, 2, N'Cơ sở Gỗ Đồng Tâm 01', N'Đồng Tâm, Hai Bà Trưng, Hà Nội', '0902000002', N'Trần Minh Đức'),
-    (7, 3, N'Trạm Lưu Giữ Thụy Hải 01', N'Thụy Hải, Thái Thụy, Thái Bình', '0903000001', N'Phạm Thị Lan'),
-    (4, 3, N'Điểm Lưu Giữ Đồng Tâm 01', N'Đồng Tâm, Hai Bà Trưng, Hà Nội', '0903000002', N'Hoàng Đức Long'),
-    -- THÊM DỮ LIỆU MỚI
-    (7, 1, N'Cơ sở Giống Thụy Hải 01', N'Thụy Hải, Thái Thụy, Thái Bình', '0901000003', N'Nguyễn Thị Mai'),
-    (8, 1, N'Cơ sở Giống Thụy Xuân 01', N'Thụy Xuân, Thái Thụy, Thái Bình', '0901000004', N'Trần Văn Nam'),
-    (3, 1, N'Cơ sở Giống Bách Khoa 02', N'Bách Khoa, Hai Bà Trưng, Hà Nội', '0901000005', N'Phạm Minh Tuấn'),
-    (7, 2, N'Cơ sở Gỗ Thụy Hải 01', N'Thụy Hải, Thái Thụy, Thái Bình', '0902000003', N'Lê Văn Hải')
+/* Seed: tạo DiaChi trước rồi gán FK cho CoSo */
+INSERT INTO DiaChi (DiaChiDayDu, Lat, Lng) VALUES
+    (N'Bách Khoa, Hai Bà Trưng, Hà Nội', NULL, NULL),
+    (N'Đồng Tâm, Hai Bà Trưng, Hà Nội', NULL, NULL),
+    (N'Thụy Hải, Thái Thụy, Thái Bình', NULL, NULL),
+    (N'Thụy Xuân, Thái Thụy, Thái Bình', NULL, NULL)
+GO
+
+INSERT INTO CoSo (DonViId, LoaiCoSoId, Ten, DiaChiId, SDT, NguoiDaiDien)
+SELECT 3, 1, N'Cơ sở Giống Bách Khoa 01', d.Id, '0901000001', N'Đào Minh Phúc' FROM DiaChi d WHERE d.DiaChiDayDu = N'Bách Khoa, Hai Bà Trưng, Hà Nội'
+UNION ALL SELECT 4, 1, N'Cơ sở Giống Đồng Tâm 01', d.Id, '0901000002', N'Lê Quốc Anh' FROM DiaChi d WHERE d.DiaChiDayDu = N'Đồng Tâm, Hai Bà Trưng, Hà Nội'
+UNION ALL SELECT 3, 2, N'Cơ sở Gỗ Bách Khoa 01', d.Id, '0902000001', N'Nguyễn Văn Hùng' FROM DiaChi d WHERE d.DiaChiDayDu = N'Bách Khoa, Hai Bà Trưng, Hà Nội'
+UNION ALL SELECT 4, 2, N'Cơ sở Gỗ Đồng Tâm 01', d.Id, '0902000002', N'Trần Minh Đức' FROM DiaChi d WHERE d.DiaChiDayDu = N'Đồng Tâm, Hai Bà Trưng, Hà Nội'
+UNION ALL SELECT 7, 3, N'Trạm Lưu Giữ Thụy Hải 01', d.Id, '0903000001', N'Phạm Thị Lan' FROM DiaChi d WHERE d.DiaChiDayDu = N'Thụy Hải, Thái Thụy, Thái Bình'
+UNION ALL SELECT 4, 3, N'Điểm Lưu Giữ Đồng Tâm 01', d.Id, '0903000002', N'Hoàng Đức Long' FROM DiaChi d WHERE d.DiaChiDayDu = N'Đồng Tâm, Hai Bà Trưng, Hà Nội'
+UNION ALL SELECT 7, 1, N'Cơ sở Giống Thụy Hải 01', d.Id, '0901000003', N'Nguyễn Thị Mai' FROM DiaChi d WHERE d.DiaChiDayDu = N'Thụy Hải, Thái Thụy, Thái Bình'
+UNION ALL SELECT 8, 1, N'Cơ sở Giống Thụy Xuân 01', d.Id, '0901000004', N'Trần Văn Nam' FROM DiaChi d WHERE d.DiaChiDayDu = N'Thụy Xuân, Thái Thụy, Thái Bình'
+UNION ALL SELECT 3, 1, N'Cơ sở Giống Bách Khoa 02', d.Id, '0901000005', N'Phạm Minh Tuấn' FROM DiaChi d WHERE d.DiaChiDayDu = N'Bách Khoa, Hai Bà Trưng, Hà Nội'
+UNION ALL SELECT 7, 2, N'Cơ sở Gỗ Thụy Hải 01', d.Id, '0902000003', N'Lê Văn Hải' FROM DiaChi d WHERE d.DiaChiDayDu = N'Thụy Hải, Thái Thụy, Thái Bình'
 GO
 
 CREATE VIEW ViewCoSo AS
     SELECT 
-        CoSo.*,
+        CoSo.Id,
+        CoSo.DonViId,
+        CoSo.LoaiCoSoId,
+        CoSo.Ten,
+        CoSo.DiaChiId,
+        DiaChi.DiaChiDayDu AS DiaChi,
+        CAST(DiaChi.Lat AS FLOAT) AS Lat,
+        CAST(DiaChi.Lng AS FLOAT) AS Lng,
+        CoSo.SDT,
+        CoSo.NguoiDaiDien,
         DonVi.Ten AS TenDonVi,
         LoaiCoSo.Ten AS TenLoaiCoSo
     FROM CoSo
     INNER JOIN DonVi ON CoSo.DonViId = DonVi.Id
     INNER JOIN LoaiCoSo ON CoSo.LoaiCoSoId = LoaiCoSo.Id
+    LEFT JOIN DiaChi ON CoSo.DiaChiId = DiaChi.Id
 GO
 
 /* =========================

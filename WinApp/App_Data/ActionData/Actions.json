@@ -22,6 +22,7 @@
     "loaidongvat": "Loài động vật",
     "loaigiong": "Loài giống",
     "lichsutacdong": "Lịch sử tác động",
+    "facilitymap": "Bản đồ cơ sở",  
     ".": ""
   },
   "actors": {
@@ -72,7 +73,7 @@
         "Childs": [
           {
             "Text": "Tất cả cơ sở",
-            "Refs": [ "coso/index" ]
+            "Refs": [ "coso/index", "facilitymap" ]
           },
           {
             "Text": "Giống cây trồng",
@@ -110,7 +111,7 @@
         "Childs": [
           {
             "Text": "Tất cả cơ sở",
-            "Refs": [ "coso/index" ]
+            "Refs": [ "coso/index", "facilitymap" ]
           },
           {
             "Text": "Giống cây trồng",

@@ -39,7 +39,6 @@ namespace Services
 
         static ViewCoSo[] _tatCaCoSo;
 
-        // Cache lại toàn bộ cơ sở để truy xuất tức thì theo ID
         static public ViewCoSo[] TatCaCoSo
         {
             get
@@ -50,7 +49,6 @@ namespace Services
             }
         }
 
-        // Tìm cơ sở theo ID từ bộ nhớ cache
         static public ViewCoSo LayChiTiet(int id)
         {
             return TatCaCoSo.FirstOrDefault(x => x.Id == id);

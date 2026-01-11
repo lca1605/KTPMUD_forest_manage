@@ -20,7 +20,7 @@ namespace WinApp.Views.LichSuTacDong
             MainView.Header.ActionPanel.Children.Clear();
 
             context.TableColumns = new TC[] {
-                new TC { Name = "MoTa", Caption = "Thao Tác", Width = 500 },
+                new TC { Name = "MoTa", Caption = "Thao Tác", Width = 800 },
                 new TC { Name = "ThoiGian", Caption = "Thời gian", Width = 250 },
             };
 

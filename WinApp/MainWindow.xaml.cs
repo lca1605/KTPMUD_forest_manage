@@ -65,7 +65,7 @@ namespace WinApp
             //App.Start();
 
             App.User = new Actors.Admin();
-            App.Request("home");
+            App.Request("login");
         }
     }
 }

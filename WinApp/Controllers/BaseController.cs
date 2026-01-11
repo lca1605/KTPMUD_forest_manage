@@ -159,7 +159,6 @@ namespace WinApp.Controllers
             });
         }
 
-        // KTPMUD: Đây là hàm quan trọng nhất để tuân thủ yêu cầu DataController
         protected void ExecSQL(string sql)
         {
             Provider.CreateCommand(cmd => {

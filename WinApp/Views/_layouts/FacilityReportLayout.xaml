@@ -50,10 +50,6 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <TextBlock VerticalAlignment="Center">
-                    <TextBlock Text="Tổng số: " FontWeight="SemiBold"/>
-                    <TextBlock x:Name="Total" />
-                </TextBlock>
             </Grid>
         </Border>
     </Grid>

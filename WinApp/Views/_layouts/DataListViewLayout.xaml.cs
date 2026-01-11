@@ -60,6 +60,11 @@ namespace WinApp.Views
             InitializeComponent();
 
             var grid = new Vst.Controls.TableView();
+            // Handle long text nicely in cells (wrap within the cell; full text via tooltip).
+            grid.OverflowMode = Vst.Controls.TableView.CellOverflowMode.Wrap;
+            grid.WrapMaxLines = 2;
+            grid.RowHeight = 48; // enough for ~2 lines
+
             Body.Child = grid;
 
             grid.OpenItem += e => {

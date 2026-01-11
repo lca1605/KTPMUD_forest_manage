@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Facility Map</title>
+
+  <!-- Leaflet (CDN). If your internal network blocks Internet, you can download these files and reference locally. -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+    .popup-title { font-weight: 600; }
+    .popup-sub { margin-top: 4px; opacity: .85; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    // Basic map.
+    const map = L.map('map', { zoomControl: true }).setView([16.0, 106.0], 6);
+
+    // OSM tiles (free; include attribution).
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const layer = L.layerGroup().addTo(map);
+
+    let facilities = [];
+    let markersById = new Map();
+
+    function safeNum(x) {
+      const v = Number(x);
+      return Number.isFinite(v) ? v : null;
+    }
+
+    function clearMarkers() {
+      layer.clearLayers();
+      markersById.clear();
+    }
+
+    // Called by C# via ExecuteScriptAsync: window.setFacilities([...])
+    window.setFacilities = function(list) {
+      facilities = Array.isArray(list) ? list : [];
+      clearMarkers();
+
+      for (const f of facilities) {
+        const lat = safeNum(f.lat);
+        const lng = safeNum(f.lng);
+        if (lat == null || lng == null) continue;
+
+        const m = L.marker([lat, lng]).addTo(layer);
+
+        const name = (f.name ?? '').toString();
+        const typeId = (f.typeId ?? '').toString();
+
+        m.bindPopup(
+          `<div class="popup-title">${escapeHtml(name)}</div>` +
+          `<div class="popup-sub">Loại: ${escapeHtml(typeId)}</div>`
+        );
+
+        // Notify host (WPF) when marker clicked.
+        m.on('click', () => {
+          try {
+            if (window.chrome && window.chrome.webview) {
+              window.chrome.webview.postMessage({ type: 'markerClick', id: f.id });
+            }
+          } catch {}
+        });
+
+        markersById.set(Number(f.id), m);
+      }
+    }
+
+    // Called by C#: window.selectFacility(id)
+    window.selectFacility = function(id) {
+      const key = Number(id);
+      const m = markersById.get(key);
+      if (!m) return;
+
+      map.setView(m.getLatLng(), Math.max(map.getZoom(), 14), { animate: true });
+      m.openPopup();
+    }
+
+    // Called by C#: window.fitToFacilities()
+    window.fitToFacilities = function() {
+      const latlngs = [];
+      markersById.forEach(m => latlngs.push(m.getLatLng()));
+
+      if (latlngs.length === 0) return;
+      const bounds = L.latLngBounds(latlngs);
+      map.fitBounds(bounds.pad(0.20));
+    }
+
+    function escapeHtml(s) {
+      return (s ?? '').toString()
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+  </script>
+</body>
+</html>

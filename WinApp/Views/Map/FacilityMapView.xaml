@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="WinApp.Views.FacilityMapViewLayout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WinApp.Views"
+             xmlns:vst="clr-namespace:Vst.Controls"
+             xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             mc:Ignorable="d"
+             d:DesignHeight="720" d:DesignWidth="1200">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header chuẩn theo Base (Back/Title) -->
+        <local:PageHeader x:Name="Header" Grid.Row="0"/>
+
+        <!-- Thanh search/select/fit của map -->
+        <Border Grid.Row="1" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <vst:SearchBox x:Name="FacilitySearch"
+                               Grid.Column="0"
+                               Margin="0,0,10,0"/>
+
+                <vst:SelectBox x:Name="FacilitySelect"
+                               Grid.Column="1"
+                               Margin="0,0,10,0"/>
+
+                <vst:Button x:Name="FitButton"
+                            Grid.Column="2"
+                            Text="Fit"
+                            Padding="12,6"/>
+            </Grid>
+        </Border>
+
+        <!-- Map -->
+        <Border Grid.Row="2" Background="White">
+            <wv2:WebView2 x:Name="MapWebView"/>
+        </Border>
+    </Grid>
+</UserControl>

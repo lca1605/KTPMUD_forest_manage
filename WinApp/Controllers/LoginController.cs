@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 namespace WinApp.Controllers
 {
     using Models;
-
-    // Kế thừa DataController<TaiKhoan> -> Có sẵn kết nối SQL
     class LoginController : DataController<TaiKhoan>
     {
         public override object Index()

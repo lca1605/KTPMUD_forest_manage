@@ -66,40 +66,63 @@ namespace WinApp.Controllers
 
         #region Không dùng Procedure - Insert/Update/Delete trực tiếp
         DataSchema.Table CoSoDb => Provider.GetTable<CoSo>();
+        DataSchema.Table DiaChiDb => Provider.GetTable<DiaChi>();
 
         protected override string GetProcName() => null;
 
         protected override void TryInsert(ViewCoSo e)
         {
+            Console.WriteLine(e.DiaChi);
+            if (e.DiaChi == null)
+            {
+                Console.WriteLine("null");
+            }
+            var diaChi = new DiaChi
+            {
+                DiaChiDayDu = e.DiaChi
+            };
+            ExecSQL(DiaChiDb.CreateInsertSql(diaChi));
+            var diaChiId = (int?)DiaChiDb.GetValue("Id", $"DiaChiDayDu = N'{e.DiaChi}'");
+
             var coSo = new CoSo
             {
                 DonViId = e.DonViId,
                 LoaiCoSoId = e.LoaiCoSoId,
                 Ten = e.Ten,
-                DiaChi = e.DiaChi,
+                DiaChiId = diaChiId,
                 SDT = e.SDT,
                 NguoiDaiDien = e.NguoiDaiDien
             };
 
             GhiLichSu("INSERT", $"thêm mới cơ sở: {e.Ten}");
-            var sql = CoSoDb.CreateInsertSql(coSo);
-            ExecSQL(sql);
+            ExecSQL(CoSoDb.CreateInsertSql(coSo));
+
+            e.DonViId = diaChiId;
         }
 
         protected override void TryUpdate(ViewCoSo e)
         {
+            var diaChi = new DiaChi
+            {
+                DiaChiDayDu = e.DiaChi
+            };
+            ExecSQL(DiaChiDb.CreateUpdateSql(diaChi));
+            var diaChiId = (int?)DiaChiDb.GetValue("Id", $"DiaChiDayDu = N'{e.DiaChi}'");
+
             var coSo = new CoSo
             {
                 DonViId = e.DonViId,
                 LoaiCoSoId = e.LoaiCoSoId,
                 Ten = e.Ten,
-                DiaChi = e.DiaChi,
+                DiaChiId = diaChiId,
                 SDT = e.SDT,
                 NguoiDaiDien = e.NguoiDaiDien
             };
 
             GhiLichSu("UPDATE", $"cập nhật cơ sở: {e.Ten}");
             ExecSQL(CoSoDb.CreateUpdateSql(coSo));
+
+            e.DonViId = diaChiId;
         }
 
         protected override void TryDelete(ViewCoSo e)

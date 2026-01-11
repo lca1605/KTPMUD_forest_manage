@@ -180,7 +180,51 @@ END
 go
 
 -- =============================================
--- Procedures cho bảng CoSo
+-- Procedures cho bảng DiaChi (MỚI)
+-- =============================================
+if exists (select * from sys.objects where type = 'P' and name = 'updateDiaChi')
+    drop proc updateDiaChi
+go
+create proc updateDiaChi
+( @action int
+, @Id int output
+, @DiaChiDayDu nvarchar(200) = NULL
+, @Lat decimal(9,6) = NULL
+, @Lng decimal(9,6) = NULL
+) as
+BEGIN
+    if @action = -1
+    begin
+        -- Kiểm tra xem có cơ sở nào đang sử dụng địa chỉ này không
+        if exists (select 1 from CoSo where DiaChiId = @Id)
+        begin
+            RAISERROR (N'Không thể xóa địa chỉ này vì đang được sử dụng bởi cơ sở', 16, 1)
+            return
+        end
+        -- Xóa địa chỉ
+        delete from DiaChi where Id = @Id
+        return
+    end
+    if @action = 0
+    begin
+        -- Cập nhật địa chỉ
+        update DiaChi set
+            DiaChiDayDu = @DiaChiDayDu,
+            Lat = @Lat,
+            Lng = @Lng
+            where Id = @Id
+        return
+    end
+    -- Thêm mới địa chỉ
+    insert into DiaChi (DiaChiDayDu, Lat, Lng) values (
+        @DiaChiDayDu, @Lat, @Lng
+    )
+    set @Id = @@IDENTITY
+END
+go
+
+-- =============================================
+-- Procedures cho bảng CoSo (ĐÃ SỬA - dùng DiaChiId)
 -- =============================================
 if exists (select * from sys.objects where type = 'P' and name = 'updateCoSo')
     drop proc updateCoSo
@@ -191,7 +235,7 @@ create proc updateCoSo
 , @DonViId int = NULL
 , @LoaiCoSoId int = NULL
 , @Ten nvarchar(150) = NULL
-, @DiaChi nvarchar(200) = NULL
+, @DiaChiId int = NULL
 , @SDT varchar(20) = NULL
 , @NguoiDaiDien nvarchar(100) = NULL
 ) as
@@ -216,14 +260,14 @@ BEGIN
             DonViId = @DonViId,
             LoaiCoSoId = @LoaiCoSoId,
             Ten = @Ten,
-            DiaChi = @DiaChi,
+            DiaChiId = @DiaChiId,
             SDT = @SDT,
             NguoiDaiDien = @NguoiDaiDien
             where Id = @Id
         return
     end
-    insert into CoSo values (
-        @DonViId,@LoaiCoSoId,@Ten,@DiaChi,@SDT,@NguoiDaiDien
+    insert into CoSo (DonViId, LoaiCoSoId, Ten, DiaChiId, SDT, NguoiDaiDien) values (
+        @DonViId, @LoaiCoSoId, @Ten, @DiaChiId, @SDT, @NguoiDaiDien
     )
     set @Id = @@IDENTITY
 END

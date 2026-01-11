@@ -52,7 +52,7 @@ namespace WinApp.Views
                 RenderTables(context);
             }
 
-            UpdateTotalCount();
+            
         }
 
         private void RenderFacilityInfo(Dictionary<string, string> facilityData)
@@ -145,6 +145,12 @@ namespace WinApp.Views
 
                 // 4. Khởi tạo Bảng dữ liệu
                 var grid = new Vst.Controls.TableView();
+                // Handle long text nicely in cells (wrap within the cell; full text via tooltip).
+                grid.OverflowMode = Vst.Controls.TableView.CellOverflowMode.Wrap;
+                grid.WrapMaxLines = 2;
+                // Keep your sizing logic below; RowHeight controls per-row text room.
+                grid.RowHeight = 48;
+
                 var allItems = config.Items?.Cast<object>().ToList() ?? new List<object>();
 
                 // Tính toán chiều cao linh hoạt (Max 15 dòng)
@@ -253,7 +259,7 @@ namespace WinApp.Views
                 }
                 if (searchBox != null)
                 {
-                    searchBox.Cleared += () => { grid.ItemsSource = allItems; UpdateTotalCount(); };
+                    searchBox.Cleared += () => { grid.ItemsSource = allItems;  };
                     searchBox.Searching += (txt) => ApplySearch(tableContext, txt);
                 }
 
@@ -351,7 +357,7 @@ namespace WinApp.Views
             {
                 // Hiển thị tất cả data
                 context.TableView.ItemsSource = context.OriginalItems;
-                UpdateTotalCount();
+                
                 return;
             }
 
@@ -367,7 +373,7 @@ namespace WinApp.Views
             {
                 // Không có data năm, hiển thị tất cả
                 context.TableView.ItemsSource = context.OriginalItems;
-                UpdateTotalCount();
+                
                 return;
             }
 
@@ -381,7 +387,7 @@ namespace WinApp.Views
             if (context.PeriodFilterFunc == null)
             {
                 context.TableView.ItemsSource = context.OriginalItems;
-                UpdateTotalCount();
+                
                 return;
             }
 
@@ -395,7 +401,7 @@ namespace WinApp.Views
                 }
             }
             context.TableView.ItemsSource = filtered;
-            UpdateTotalCount();
+            
         }
 
         private void ApplyPeriodFilter(TableFilterContext context)
@@ -407,7 +413,7 @@ namespace WinApp.Views
                 if (period == null || context.PeriodFilterFunc == null)
                 {
                     context.TableView.ItemsSource = context.OriginalItems;
-                    UpdateTotalCount();
+                    
                     return;
                 }
 
@@ -444,8 +450,6 @@ namespace WinApp.Views
                     // Hiển thị tất cả
                     context.TableView.ItemsSource = context.OriginalItems;
                 }
-
-                UpdateTotalCount();
             }
         }
 
@@ -467,17 +471,6 @@ namespace WinApp.Views
                 }
             }
             context.TableView.ItemsSource = filtered;
-            UpdateTotalCount();
-        }
-
-        private void UpdateTotalCount()
-        {
-            int totalRows = 0;
-            foreach (var context in tableContexts)
-            {
-                totalRows += context.TableView.RowsCount;
-            }
-            Total.Text = totalRows.ToString();
         }
 
         public FacilityReportLayout()
