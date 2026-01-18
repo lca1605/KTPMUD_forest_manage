@@ -29,7 +29,6 @@ namespace WinApp.Views
         private List<FacilityPoint> _filtered = new List<FacilityPoint>();
         private bool _webReady;
 
-        // === Base flow: engine sẽ gọi Render(context) ===
         public void Render(ViewContext context)
         {
             context.BackUrl = App.LastUrl;
@@ -253,10 +252,6 @@ namespace WinApp.Views
                      .Normalize(NormalizationForm.FormC)
                      .ToLowerInvariant();
         }
-
-        // =========================
-        // Convert context.Model item -> FacilityPoint
-        // =========================
 
         private static FacilityPoint ToFacilityPoint(object item)
         {
