@@ -1,5 +1,7 @@
 # Forestry Management System (KTPMUD)
 
+[🇻🇳 Xem phiên bản tiếng Việt](README.vi.md)
+
 ## Project Overview
 The Forestry Management System is a specialized Windows desktop application designed for the comprehensive management of forestry resources. It provides a centralized platform to track seedling nurseries, wood processing plants, and wildlife conservation centers. The system is built on the .NET Framework using a custom Model-View-Controller (MVC) architecture and features interactive mapping capabilities.
 
